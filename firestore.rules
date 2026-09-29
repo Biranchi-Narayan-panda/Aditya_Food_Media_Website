@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny all documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'jayprabhujagannath01@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Products: Public read, admin write
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isValidId(productId) && isAdmin();
+    }
+
+    // Videos: Public read, admin write
+    match /videos/{videoId} {
+      allow read: if true;
+      allow create, update, delete: if isValidId(videoId) && isAdmin();
+    }
+
+    // Portfolio: Public read, admin write
+    match /portfolio/{portfolioId} {
+      allow read: if true;
+      allow create, update, delete: if isValidId(portfolioId) && isAdmin();
+    }
+
+    // Settings: Public read, admin write
+    match /settings/{settingsId} {
+      allow read: if true;
+      allow create, update, delete: if isValidId(settingsId) && isAdmin();
+    }
+
+    // Enquiries: Public create (with validated fields), admin read & manage
+    match /enquiries/{enquiryId} {
+      allow read, update, delete: if isValidId(enquiryId) && isAdmin();
+      allow create: if isValidId(enquiryId) &&
+        request.resource.data.name is string && request.resource.data.name.size() <= 120 &&
+        request.resource.data.email is string && request.resource.data.email.size() <= 150 &&
+        request.resource.data.phone is string && request.resource.data.phone.size() <= 50 &&
+        request.resource.data.enquiryType is string && request.resource.data.enquiryType.size() <= 50 &&
+        request.resource.data.message is string && request.resource.data.message.size() <= 2000;
+    }
+
+    // Admins registry: Read/write by admins or own record check
+    match /admins/{adminId} {
+      allow read: if isSignedIn() && (request.auth.uid == adminId || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}

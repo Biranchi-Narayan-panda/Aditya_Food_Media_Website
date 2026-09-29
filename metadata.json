@@ -1,0 +1,6 @@
+{
+  "name": "Aditya Food & Media",
+  "description": "Where Quality Meets Creativity. Premium dairy products, food consultation, media production, and cinematic entertainment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

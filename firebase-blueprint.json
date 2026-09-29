@@ -1,0 +1,142 @@
+{
+  "entities": {
+    "product": {
+      "title": "Product",
+      "description": "Dairy and food product item in catalog",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "slug": { "type": "string", "maxLength": 120 },
+        "category": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "packaging": { "type": "string", "maxLength": 120 },
+        "availability": { "type": "string", "maxLength": 50 },
+        "featured": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "specifications": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "slug", "category", "description", "imageUrl"]
+    },
+    "video": {
+      "title": "Video",
+      "description": "Media video entry featuring YouTube embed and metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string", "maxLength": 200 },
+        "youtubeUrl": { "type": "string", "maxLength": 500 },
+        "youtubeVideoId": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "thumbnailUrl": { "type": "string", "maxLength": 1000 },
+        "category": { "type": "string", "maxLength": 80 },
+        "publicationDate": { "type": "string", "maxLength": 50 },
+        "duration": { "type": "string", "maxLength": 30 },
+        "featured": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "slug", "youtubeUrl", "youtubeVideoId", "category"]
+    },
+    "portfolio": {
+      "title": "PortfolioProject",
+      "description": "Media production portfolio highlight",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "videoUrl": { "type": "string", "maxLength": 500 },
+        "featured": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "category", "description", "imageUrl"]
+    },
+    "enquiry": {
+      "title": "Enquiry",
+      "description": "Customer inquiry for products, food consultation, or media collaborations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "email": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "enquiryType": { "type": "string", "maxLength": 50 },
+        "relatedItem": { "type": "string", "maxLength": 120 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "preferredContact": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "maxLength": 30 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email", "phone", "enquiryType", "message", "status"]
+    },
+    "siteSettings": {
+      "title": "SiteSettings",
+      "description": "Global website configuration, contact information, and social links",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "companyName": { "type": "string", "maxLength": 120 },
+        "tagline": { "type": "string", "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "email": { "type": "string", "maxLength": 120 },
+        "whatsapp": { "type": "string", "maxLength": 50 },
+        "address": { "type": "string", "maxLength": 300 },
+        "youtube": { "type": "string", "maxLength": 300 },
+        "instagram": { "type": "string", "maxLength": 300 },
+        "facebook": { "type": "string", "maxLength": 300 },
+        "linkedin": { "type": "string", "maxLength": 300 },
+        "xTwitter": { "type": "string", "maxLength": 300 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "companyName", "phone", "email"]
+    },
+    "admin": {
+      "title": "Admin",
+      "description": "Administrator identity and access record",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 150 },
+        "role": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "#/entities/product",
+      "description": "Dairy and food product catalog items"
+    },
+    "/videos/{videoId}": {
+      "schema": "#/entities/video",
+      "description": "Media production videos and YouTube gallery highlights"
+    },
+    "/portfolio/{portfolioId}": {
+      "schema": "#/entities/portfolio",
+      "description": "Media portfolio projects"
+    },
+    "/enquiries/{enquiryId}": {
+      "schema": "#/entities/enquiry",
+      "description": "Inbound enquiries for foods, consultation, and media"
+    },
+    "/settings/{settingsId}": {
+      "schema": "#/entities/siteSettings",
+      "description": "Global website settings and contact channels"
+    },
+    "/admins/{adminId}": {
+      "schema": "#/entities/admin",
+      "description": "Admin authorization records"
+    }
+  }
+}
