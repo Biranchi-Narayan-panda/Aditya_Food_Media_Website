@@ -37,11 +37,104 @@ import {
   Sparkles,
   Milk,
   RefreshCw,
+  Lock,
+  Unlock,
+  ShieldAlert,
+  ArrowLeft,
+  Delete,
+  Check,
 } from 'lucide-react';
 
 export const AdminPage: React.FC = () => {
   const { user, isAdmin, signInWithGoogle, logout, enableDemoAdmin, disableDemoAdmin } = useAuth();
-  const { products, videos, portfolio, settings, refreshData } = useSite();
+  const {
+    products,
+    videos,
+    portfolio,
+    settings,
+    refreshData,
+    navigate,
+    isAdminPinUnlocked,
+    unlockAdminPortal,
+    lockAdminPortal,
+  } = useSite();
+
+  // Permanent 4-Digit Security PIN
+  const PERMANENT_PIN = '1793';
+
+  // PIN security gate state
+  const isPinUnlocked = isAdminPinUnlocked;
+  const [pinDigits, setPinDigits] = useState<string[]>([]);
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [isShaking, setIsShaking] = useState(false);
+  const [pinSuccess, setPinSuccess] = useState(false);
+
+  const handlePinInput = (digit: string) => {
+    if (pinSuccess || pinDigits.length >= 4) return;
+    setPinError(null);
+    const newDigits = [...pinDigits, digit];
+    setPinDigits(newDigits);
+
+    if (newDigits.length === 4) {
+      const fullPin = newDigits.join('');
+      if (fullPin === PERMANENT_PIN) {
+        setPinSuccess(true);
+        setTimeout(() => {
+          unlockAdminPortal();
+          setPinSuccess(false);
+          setPinDigits([]);
+        }, 400);
+      } else {
+        setIsShaking(true);
+        setPinError('Incorrect PIN. Access Denied.');
+        setTimeout(() => {
+          setPinDigits([]);
+          setIsShaking(false);
+        }, 700);
+      }
+    }
+  };
+
+  const handleBackspace = () => {
+    if (pinSuccess || pinDigits.length === 0) return;
+    setPinError(null);
+    setPinDigits((prev) => prev.slice(0, prev.length - 1));
+  };
+
+  const handleClearPin = () => {
+    if (pinSuccess) return;
+    setPinError(null);
+    setPinDigits([]);
+  };
+
+  const handleLockPortal = () => {
+    setPinDigits([]);
+    setPinError(null);
+    lockAdminPortal();
+  };
+
+  const handleSignOutAndLock = async () => {
+    lockAdminPortal();
+    await logout();
+  };
+
+  // Keyboard listener for 4-digit PIN entry
+  useEffect(() => {
+    if (isPinUnlocked) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key >= '0' && e.key <= '9') {
+        handlePinInput(e.key);
+      } else if (e.key === 'Backspace') {
+        handleBackspace();
+      } else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') {
+        handleClearPin();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPinUnlocked, pinDigits, pinSuccess]);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'videos' | 'portfolio' | 'enquiries' | 'settings'>('overview');
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
@@ -199,7 +292,161 @@ export const AdminPage: React.FC = () => {
     }
   };
 
-  // Login Screen if not authorized
+  // 1. PIN Security Gate: Must enter permanent PIN (1793) before accessing management portal
+  if (!isPinUnlocked) {
+    return (
+      <div className="pt-28 pb-20 max-w-md mx-auto px-4 text-center">
+        <div
+          className={`bg-[#0e1422] border ${
+            pinError ? 'border-red-500/60 shadow-red-500/10' : 'border-amber-500/30 shadow-amber-500/10'
+          } rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 ${isShaking ? 'pin-shake' : ''} transition-all`}
+        >
+          {/* Security Emblem */}
+          <div className="relative mx-auto w-20 h-20 flex items-center justify-center">
+            <div
+              className={`absolute inset-0 ${
+                pinSuccess ? 'bg-emerald-500/20' : pinError ? 'bg-red-500/20' : 'bg-amber-500/20'
+              } rounded-full blur-xl scale-125 animate-pulse transition-colors`}
+            />
+            <div
+              className={`w-16 h-16 rounded-2xl p-[1.5px] shadow-xl relative z-10 transition-all ${
+                pinSuccess
+                  ? 'bg-gradient-to-br from-emerald-400 to-emerald-600'
+                  : pinError
+                  ? 'bg-gradient-to-br from-red-400 to-red-600'
+                  : 'bg-gradient-to-br from-amber-400 via-amber-600 to-amber-700'
+              }`}
+            >
+              <div className="w-full h-full bg-[#0b0f17] rounded-[14px] flex items-center justify-center">
+                {pinSuccess ? (
+                  <Check className="w-8 h-8 text-emerald-400 animate-in zoom-in duration-200" />
+                ) : pinError ? (
+                  <ShieldAlert className="w-8 h-8 text-red-400 animate-in zoom-in duration-200" />
+                ) : (
+                  <Lock className="w-8 h-8 text-amber-400" />
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <h1 className="font-serif text-2xl font-bold text-white tracking-wide">
+              Security Gate
+            </h1>
+            <p className="text-xs text-amber-200/80 font-medium uppercase tracking-wider">
+              Permanent PIN Passcode Required
+            </p>
+            <p className="text-[11px] text-slate-400 max-w-xs mx-auto pt-1 leading-relaxed">
+              Enter your 4-digit authorization PIN to unlock the Aditya Management Portal.
+            </p>
+          </div>
+
+          {/* 4 Digit Boxes */}
+          <div className="flex justify-center items-center gap-3.5 py-2">
+            {[0, 1, 2, 3].map((idx) => {
+              const isFilled = pinDigits.length > idx;
+              return (
+                <div
+                  key={idx}
+                  className={`w-13 h-14 rounded-2xl flex items-center justify-center border-2 transition-all duration-200 ${
+                    pinSuccess
+                      ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 scale-105 shadow-lg shadow-emerald-500/20'
+                      : pinError
+                      ? 'border-red-500 bg-red-950/30 text-red-300'
+                      : isFilled
+                      ? 'border-amber-400 bg-amber-500/15 text-amber-300 scale-105 shadow-lg shadow-amber-500/20'
+                      : 'border-white/10 bg-[#080b12] text-slate-600'
+                  }`}
+                >
+                  {isFilled ? (
+                    <span className="w-3.5 h-3.5 rounded-full bg-amber-400 shadow-md shadow-amber-400/50 animate-in zoom-in-50 duration-150" />
+                  ) : (
+                    <span className="w-2 h-2 rounded-full bg-white/10" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Error / Status Message */}
+          <div className="min-h-5 flex items-center justify-center">
+            {pinError ? (
+              <span className="text-xs font-semibold text-red-400 flex items-center space-x-1.5 animate-in fade-in">
+                <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                <span>{pinError}</span>
+              </span>
+            ) : pinSuccess ? (
+              <span className="text-xs font-semibold text-emerald-400 flex items-center space-x-1.5 animate-in fade-in">
+                <Check className="w-3.5 h-3.5 shrink-0" />
+                <span>PIN Verified &bull; Accessing Portal...</span>
+              </span>
+            ) : (
+              <span className="text-[11px] text-slate-500 font-mono tracking-wider">
+                {pinDigits.length} / 4 DIGITS
+              </span>
+            )}
+          </div>
+
+          {/* Numeric Keypad */}
+          <div className="grid grid-cols-3 gap-2.5 max-w-xs mx-auto pt-1">
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+              <button
+                key={digit}
+                type="button"
+                onClick={() => handlePinInput(digit)}
+                disabled={pinSuccess}
+                className="h-12 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:border-amber-400/50 active:scale-95 text-white font-semibold text-base border border-white/5 transition-all focus:outline-none"
+              >
+                {digit}
+              </button>
+            ))}
+
+            <button
+              type="button"
+              onClick={handleClearPin}
+              disabled={pinSuccess || pinDigits.length === 0}
+              className="h-12 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-slate-400 hover:text-white font-medium text-xs border border-white/5 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              Clear
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handlePinInput('0')}
+              disabled={pinSuccess}
+              className="h-12 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:border-amber-400/50 active:scale-95 text-white font-semibold text-base border border-white/5 transition-all focus:outline-none"
+            >
+              0
+            </button>
+
+            <button
+              type="button"
+              onClick={handleBackspace}
+              disabled={pinSuccess || pinDigits.length === 0}
+              className="h-12 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-slate-400 hover:text-white flex items-center justify-center border border-white/5 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              aria-label="Backspace"
+            >
+              <Delete className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Return to website link */}
+          <div className="pt-2 border-t border-white/10 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="inline-flex items-center space-x-1.5 text-xs text-slate-400 hover:text-amber-300 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Return to Public Website</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Login Screen if not authorized
   if (!isAdmin) {
     return (
       <div className="pt-32 pb-24 max-w-md mx-auto px-4 text-center">
@@ -246,6 +493,25 @@ export const AdminPage: React.FC = () => {
           <div className="text-[11px] text-slate-500">
             Registered Admin Email: <span className="text-slate-400">jayprabhujagannath01@gmail.com</span>
           </div>
+
+          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-500">
+            <button
+              type="button"
+              onClick={handleLockPortal}
+              className="inline-flex items-center space-x-1.5 hover:text-amber-300 transition-colors"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Lock Portal (PIN)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="inline-flex items-center space-x-1.5 hover:text-slate-300 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Site</span>
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -266,7 +532,7 @@ export const AdminPage: React.FC = () => {
           </div>
           <div>
             <h1 className="font-serif text-xl sm:text-2xl font-bold text-white">
-              Aditya Management Dashboard
+              Aditya Management Portal
             </h1>
             <p className="text-xs text-slate-400">
               Logged in as: <span className="text-amber-400 font-mono">{user?.email || 'Administrator (Active)'}</span>
@@ -281,6 +547,14 @@ export const AdminPage: React.FC = () => {
             title="Reload database items"
           >
             <RefreshCw className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleLockPortal}
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-colors"
+            title="Lock Portal with PIN"
+          >
+            <Lock className="w-4 h-4" />
+            <span>Lock Portal</span>
           </button>
           <button
             onClick={logout}

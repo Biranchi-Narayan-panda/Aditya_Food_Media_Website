@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { settings, navigate, getWhatsAppUrl } = useSite();
+  const { settings, navigate, getWhatsAppUrl, openAdminPortal } = useSite();
   const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
@@ -253,7 +253,7 @@ export const Footer: React.FC = () => {
             <button onClick={() => navigate('/terms')} className="hover:text-slate-200 transition-colors">
               Terms &amp; Conditions
             </button>
-            <button onClick={() => navigate('/admin')} className="hover:text-amber-400 transition-colors flex items-center space-x-1">
+            <button onClick={openAdminPortal} className="hover:text-amber-400 transition-colors flex items-center space-x-1 cursor-pointer">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Admin Portal</span>
             </button>

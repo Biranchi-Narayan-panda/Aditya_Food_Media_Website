@@ -7,6 +7,7 @@ import { BrandIntro } from './components/BrandIntro';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { VideoModal } from './components/VideoModal';
 import { ProductModal } from './components/ProductModal';
+import { AdminPinModal } from './components/AdminPinModal';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -111,6 +112,7 @@ const AppContent: React.FC = () => {
       <FloatingWhatsApp />
       <VideoModal />
       <ProductModal />
+      <AdminPinModal />
     </div>
   );
 };

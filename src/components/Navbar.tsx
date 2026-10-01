@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { currentPath, navigate, getWhatsAppUrl } = useSite();
+  const { currentPath, navigate, getWhatsAppUrl, openAdminPortal, isAdminPinUnlocked } = useSite();
   const { isAdmin } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -239,10 +239,10 @@ export const Navbar: React.FC = () => {
 
             {/* Admin Portal Link */}
             <button
-              onClick={() => handleNav('/admin')}
-              title={isAdmin ? 'Admin Dashboard (Active)' : 'Admin Portal'}
+              onClick={openAdminPortal}
+              title={isAdmin && isAdminPinUnlocked ? 'Aditya Management Portal (Active)' : 'Admin Portal (PIN Protected)'}
               className={`p-2 rounded-full border transition-all ${
-                isAdmin
+                isAdmin && isAdminPinUnlocked
                   ? 'border-amber-400 bg-amber-500/20 text-amber-300 ring-2 ring-amber-400/30'
                   : 'border-white/10 text-slate-400 hover:text-white hover:border-white/30'
               }`}
@@ -254,9 +254,9 @@ export const Navbar: React.FC = () => {
           {/* Mobile Menu Button */}
           <div className="flex items-center space-x-2 lg:hidden">
             <button
-              onClick={() => handleNav('/admin')}
+              onClick={openAdminPortal}
               className="p-2 text-slate-400 hover:text-amber-400"
-              title="Admin Portal"
+              title="Admin Portal (PIN Protected)"
             >
               <ShieldCheck className="w-5 h-5" />
             </button>
