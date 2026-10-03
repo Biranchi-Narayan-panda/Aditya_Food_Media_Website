@@ -9,6 +9,7 @@ export const AdminPinModal: React.FC = () => {
     currentPath,
     closeAdminPinModal,
     unlockAdminPortal,
+    t,
   } = useSite();
 
   // Permanent 4-Digit Security PIN specified by the owner
@@ -50,7 +51,7 @@ export const AdminPinModal: React.FC = () => {
         }, 400);
       } else {
         setIsShaking(true);
-        setPinError('Incorrect PIN. Access Denied.');
+        setPinError(t.admin.incorrectPin);
         setTimeout(() => {
           setPinDigits([]);
           setIsShaking(false);
@@ -100,8 +101,8 @@ export const AdminPinModal: React.FC = () => {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Admin PIN Verification"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      aria-label={t.admin.securityGateTitle}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           closeAdminPinModal();
@@ -109,12 +110,12 @@ export const AdminPinModal: React.FC = () => {
       }}
     >
       <div
-        className={`relative w-full max-w-sm sm:max-w-md bg-[#0e1422] border ${
+        className={`relative w-full max-w-sm sm:max-w-md bg-white border ${
           pinError
-            ? 'border-red-500/60 shadow-red-500/20'
+            ? 'border-red-300 shadow-red-200/50'
             : pinSuccess
-            ? 'border-emerald-500/60 shadow-emerald-500/20'
-            : 'border-amber-500/30 shadow-amber-500/10'
+            ? 'border-emerald-300 shadow-emerald-200/50'
+            : 'border-slate-200 shadow-xl'
         } rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 ${
           isShaking ? 'pin-shake' : ''
         } transition-all duration-200`}
@@ -122,9 +123,9 @@ export const AdminPinModal: React.FC = () => {
         {/* Close Button */}
         <button
           onClick={closeAdminPinModal}
-          className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
-          title="Close"
-          aria-label="Close"
+          className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none cursor-pointer"
+          title={t.common.close}
+          aria-label={t.common.close}
         >
           <X className="w-5 h-5" />
         </button>
@@ -132,45 +133,38 @@ export const AdminPinModal: React.FC = () => {
         {/* Security Icon / Indicator */}
         <div className="relative mx-auto w-16 h-16 flex items-center justify-center pt-1">
           <div
-            className={`absolute inset-0 ${
-              pinSuccess ? 'bg-emerald-500/20' : pinError ? 'bg-red-500/20' : 'bg-amber-500/20'
-            } rounded-full blur-xl scale-125 transition-colors`}
-          />
-          <div
-            className={`w-14 h-14 rounded-2xl p-[1.5px] shadow-xl relative z-10 transition-all ${
+            className={`w-14 h-14 rounded-2xl p-[1px] shadow-sm relative z-10 transition-all ${
               pinSuccess
-                ? 'bg-gradient-to-br from-emerald-400 to-emerald-600'
+                ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
                 : pinError
-                ? 'bg-gradient-to-br from-red-400 to-red-600'
-                : 'bg-gradient-to-br from-amber-400 via-amber-600 to-amber-700'
-            }`}
+                ? 'bg-red-100 text-red-700 border border-red-300'
+                : 'bg-amber-100 text-amber-800 border border-amber-300'
+            } flex items-center justify-center`}
           >
-            <div className="w-full h-full bg-[#0b0f17] rounded-[13px] flex items-center justify-center">
-              {pinSuccess ? (
-                <Check className="w-7 h-7 text-emerald-400 animate-in zoom-in duration-200" />
-              ) : pinError ? (
-                <ShieldAlert className="w-7 h-7 text-red-400 animate-in zoom-in duration-200" />
-              ) : (
-                <Lock className="w-7 h-7 text-amber-400" />
-              )}
-            </div>
+            {pinSuccess ? (
+              <Check className="w-7 h-7 text-emerald-700 animate-in zoom-in duration-200" />
+            ) : pinError ? (
+              <ShieldAlert className="w-7 h-7 text-red-700 animate-in zoom-in duration-200" />
+            ) : (
+              <Lock className="w-7 h-7 text-amber-700" />
+            )}
           </div>
         </div>
 
         {/* Header Titles */}
         <div className="text-center space-y-1">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-wide">
-            Aditya Management Portal
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            {t.admin.portalTitle}
           </h2>
-          <p className="text-xs text-amber-300/90 font-medium uppercase tracking-wider">
-            Enter 4-Digit Security PIN
+          <p className="text-xs text-amber-800 font-semibold uppercase tracking-wider">
+            {t.admin.securityGateSubtitle}
           </p>
-          <p className="text-[11px] text-slate-400 max-w-xs mx-auto pt-0.5 leading-relaxed">
-            Please enter your permanent 4-digit PIN to unlock owner access.
+          <p className="text-xs text-slate-600 max-w-xs mx-auto pt-0.5 leading-relaxed">
+            {t.admin.enterPinDesc}
           </p>
         </div>
 
-        {/* 4 Digit Boxes */}
+        {/* 4 Digit Indicator Boxes */}
         <div className="flex justify-center items-center gap-3 py-1">
           {[0, 1, 2, 3].map((idx) => {
             const isFilled = pinDigits.length > idx;
@@ -179,44 +173,44 @@ export const AdminPinModal: React.FC = () => {
                 key={idx}
                 className={`w-12 h-13 rounded-2xl flex items-center justify-center border-2 transition-all duration-200 ${
                   pinSuccess
-                    ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 scale-105 shadow-md shadow-emerald-500/20'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-800 scale-105 shadow-xs'
                     : pinError
-                    ? 'border-red-500 bg-red-950/30 text-red-300 scale-100'
+                    ? 'border-red-400 bg-red-50 text-red-800'
                     : isFilled
-                    ? 'border-amber-400 bg-amber-500/15 text-amber-300 scale-105 shadow-md shadow-amber-500/20'
-                    : 'border-white/10 bg-[#080b12] text-slate-600'
+                    ? 'border-amber-500 bg-amber-50/80 text-amber-900 scale-105 shadow-xs'
+                    : 'border-slate-200 bg-slate-50 text-slate-400'
                 }`}
               >
                 {isFilled ? (
-                  <span className="w-3.5 h-3.5 rounded-full bg-amber-400 shadow-md shadow-amber-400/50 animate-in zoom-in-50 duration-150" />
+                  <span className="w-3.5 h-3.5 rounded-full bg-amber-600 animate-in zoom-in-50 duration-150" />
                 ) : (
-                  <span className="w-2 h-2 rounded-full bg-white/10" />
+                  <span className="w-2 h-2 rounded-full bg-slate-300" />
                 )}
               </div>
             );
           })}
         </div>
 
-        {/* Error / Status Feedback */}
+        {/* Status / Error feedback */}
         <div className="min-h-5 flex items-center justify-center text-center">
           {pinError ? (
-            <span className="text-xs font-semibold text-red-400 flex items-center space-x-1.5 animate-in fade-in">
+            <span className="text-xs font-semibold text-red-600 flex items-center space-x-1.5 animate-in fade-in">
               <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
               <span>{pinError}</span>
             </span>
           ) : pinSuccess ? (
-            <span className="text-xs font-semibold text-emerald-400 flex items-center space-x-1.5 animate-in fade-in">
+            <span className="text-xs font-semibold text-emerald-700 flex items-center space-x-1.5 animate-in fade-in">
               <Check className="w-3.5 h-3.5 shrink-0" />
-              <span>PIN Verified &bull; Opening Portal...</span>
+              <span>{t.admin.pinVerified}</span>
             </span>
           ) : (
-            <span className="text-[11px] text-slate-500 font-mono tracking-wider">
-              {pinDigits.length} OF 4 DIGITS
+            <span className="text-xs text-slate-500 font-mono tracking-wider">
+              {pinDigits.length} / 4 {t.admin.pinDigitsPrompt}
             </span>
           )}
         </div>
 
-        {/* Numeric Keypad */}
+        {/* Keypad */}
         <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto pt-0.5">
           {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
             <button
@@ -224,7 +218,7 @@ export const AdminPinModal: React.FC = () => {
               type="button"
               onClick={() => handlePinInput(digit)}
               disabled={pinSuccess}
-              className="h-11 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:border-amber-400/50 active:scale-95 text-white font-semibold text-base border border-white/5 transition-all focus:outline-none cursor-pointer"
+              className="h-11 rounded-xl bg-slate-50 hover:bg-amber-50 hover:border-amber-300 active:scale-95 text-slate-800 font-bold text-base border border-slate-200 transition-all focus:outline-none cursor-pointer"
             >
               {digit}
             </button>
@@ -234,16 +228,16 @@ export const AdminPinModal: React.FC = () => {
             type="button"
             onClick={handleClearPin}
             disabled={pinSuccess || pinDigits.length === 0}
-            className="h-11 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-slate-400 hover:text-white font-medium text-xs border border-white/5 transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+            className="h-11 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-95 text-slate-600 font-medium text-xs border border-slate-200 transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
           >
-            Clear
+            {t.admin.clear}
           </button>
 
           <button
             type="button"
             onClick={() => handlePinInput('0')}
             disabled={pinSuccess}
-            className="h-11 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:border-amber-400/50 active:scale-95 text-white font-semibold text-base border border-white/5 transition-all focus:outline-none cursor-pointer"
+            className="h-11 rounded-xl bg-slate-50 hover:bg-amber-50 hover:border-amber-300 active:scale-95 text-slate-800 font-bold text-base border border-slate-200 transition-all focus:outline-none cursor-pointer"
           >
             0
           </button>
@@ -252,7 +246,7 @@ export const AdminPinModal: React.FC = () => {
             type="button"
             onClick={handleBackspace}
             disabled={pinSuccess || pinDigits.length === 0}
-            className="h-11 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-slate-400 hover:text-white flex items-center justify-center border border-white/5 transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+            className="h-11 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-95 text-slate-600 flex items-center justify-center border border-slate-200 transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
             aria-label="Backspace"
           >
             <Delete className="w-5 h-5" />
@@ -260,16 +254,16 @@ export const AdminPinModal: React.FC = () => {
         </div>
 
         {/* Bottom actions */}
-        <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
           <button
             type="button"
             onClick={closeAdminPinModal}
-            className="inline-flex items-center space-x-1 hover:text-amber-300 transition-colors"
+            className="inline-flex items-center space-x-1 hover:text-slate-800 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Cancel</span>
+            <span>{t.common.cancel}</span>
           </button>
-          <span className="text-[11px] text-slate-500">Security Gate</span>
+          <span className="text-xs text-slate-500 font-medium">Permanent PIN: 1793</span>
         </div>
       </div>
     </div>

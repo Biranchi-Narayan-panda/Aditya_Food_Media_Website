@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { Product, VideoItem, PortfolioItem, SiteSettings } from '../types';
 import { fetchProducts, fetchVideos, fetchPortfolio, fetchSiteSettings } from '../firebase/services';
 import { INITIAL_SETTINGS } from '../firebase/seedData';
+import { Language, TranslationDictionary, translations, PRODUCT_TRANSLATIONS } from '../i18n/translations';
 
 interface SiteContextType {
   products: Product[];
@@ -23,6 +24,17 @@ interface SiteContextType {
   closeAdminPinModal: () => void;
   unlockAdminPortal: () => void;
   lockAdminPortal: () => void;
+  // Bilingual i18n
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: TranslationDictionary;
+  getProductLocalized: (product: Product) => {
+    name: string;
+    category: string;
+    description: string;
+    packaging?: string;
+    availability?: string;
+  };
 }
 
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
@@ -33,6 +45,59 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
   const [loading, setLoading] = useState(true);
+
+  // Bilingual Language State (Defaults to ODIA for first-time visitors)
+  const [language, setLanguageState] = useState<Language>(() => {
+    try {
+      const stored = localStorage.getItem('aditya_user_lang');
+      if (stored === 'en' || stored === 'or') {
+        return stored as Language;
+      }
+    } catch {
+      // ignore storage access errors
+    }
+    // REQUIRED: The DEFAULT WEBSITE LANGUAGE must be ODIA ('or')
+    return 'or';
+  });
+
+  const setLanguage = useCallback((newLang: Language) => {
+    setLanguageState(newLang);
+    try {
+      localStorage.setItem('aditya_user_lang', newLang);
+      document.documentElement.lang = newLang === 'or' ? 'or' : 'en';
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language === 'or' ? 'or' : 'en';
+  }, [language]);
+
+  const t = translations[language] || translations.or;
+
+  const getProductLocalized = useCallback(
+    (product: Product) => {
+      if (language === 'or') {
+        const odiaData = PRODUCT_TRANSLATIONS[product.id];
+        return {
+          name: product.nameOr || (odiaData ? odiaData.name : product.name),
+          category: product.categoryOr || (odiaData ? odiaData.category : product.category),
+          description: product.descriptionOr || (odiaData ? odiaData.description : product.description),
+          packaging: product.packagingOr || (odiaData ? odiaData.packaging : product.packaging),
+          availability: product.availabilityOr || (odiaData ? odiaData.availability : product.availability),
+        };
+      }
+      return {
+        name: product.name,
+        category: product.category,
+        description: product.description,
+        packaging: product.packaging,
+        availability: product.availability,
+      };
+    },
+    [language]
+  );
 
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
@@ -159,6 +224,10 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         closeAdminPinModal,
         unlockAdminPortal,
         lockAdminPortal,
+        language,
+        setLanguage,
+        t,
+        getProductLocalized,
       }}
     >
       {children}

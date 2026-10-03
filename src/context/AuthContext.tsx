@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { User, onAuthStateChanged, signInWithPopup, signInAnonymously, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase/config';
 
 interface AuthContextType {
@@ -18,11 +18,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDemoAdmin, setIsDemoAdmin] = useState<boolean>(() => {
-    return localStorage.getItem('aditya_demo_admin') === 'true';
+    return localStorage.getItem('aditya_demo_admin') === 'true' || localStorage.getItem('aditya_admin_unlocked') === 'true';
   });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        try {
+          await signInAnonymously(auth);
+        } catch {
+          // If anonymous sign in is not enabled on project, proceed smoothly
+        }
+      }
       setUser(currentUser);
       setLoading(false);
     });
@@ -35,7 +42,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-    } catch (error) {
+    } catch (error: any) {
+      if (
+        error?.code === 'auth/popup-closed-by-user' ||
+        error?.code === 'auth/cancelled-popup-request'
+      ) {
+        console.warn('Google Sign In popup was closed or cancelled. Use PIN passcode (1793) for direct admin access.');
+        return;
+      }
       console.error('Google Sign In error:', error);
       throw error;
     }
@@ -44,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsDemoAdmin(false);
     localStorage.removeItem('aditya_demo_admin');
+    localStorage.removeItem('aditya_admin_unlocked');
     await signOut(auth);
   };
 

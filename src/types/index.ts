@@ -12,6 +12,12 @@ export interface Product {
   specifications?: string;
   createdAt?: string;
   updatedAt?: string;
+  // Bilingual Odia Fields (Editable in Admin)
+  nameOr?: string;
+  categoryOr?: string;
+  descriptionOr?: string;
+  packagingOr?: string;
+  availabilityOr?: string;
 }
 
 export interface VideoItem {
@@ -55,6 +61,8 @@ export interface Enquiry {
   preferredContact?: 'whatsapp' | 'email' | 'phone';
   status: 'pending' | 'contacted' | 'resolved';
   createdAt: string;
+  dbSource?: 'superbase' | 'firebase';
+  tableName?: string;
 }
 
 export interface SiteSettings {
@@ -71,6 +79,11 @@ export interface SiteSettings {
   linkedin: string;
   xTwitter: string;
   updatedAt?: string;
+  // Bilingual settings
+  defaultLanguage?: 'or' | 'en';
+  companyNameOr?: string;
+  taglineOr?: string;
+  addressOr?: string;
 }
 
 export interface AdminUser {

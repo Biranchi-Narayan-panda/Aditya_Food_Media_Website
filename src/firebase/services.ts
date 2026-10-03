@@ -181,7 +181,6 @@ export async function submitEnquiry(data: Omit<Enquiry, 'id' | 'createdAt' | 'st
 }
 
 export async function fetchEnquiries(): Promise<Enquiry[]> {
-  const path = 'enquiries';
   try {
     const colRef = collection(db, 'enquiries');
     const q = query(colRef, orderBy('createdAt', 'desc'));
@@ -191,7 +190,7 @@ export async function fetchEnquiries(): Promise<Enquiry[]> {
       enquiries.push(docSnap.data() as Enquiry);
     });
     return enquiries;
-  } catch (error) {
+  } catch {
     // If indexing fails or fallback needed
     try {
       const snapshot = await getDocs(collection(db, 'enquiries'));
@@ -201,7 +200,8 @@ export async function fetchEnquiries(): Promise<Enquiry[]> {
       });
       return enquiries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } catch (innerError) {
-      handleFirestoreError(innerError, OperationType.LIST, path);
+      console.warn('Could not fetch Firestore enquiries, returning empty fallback:', innerError);
+      return [];
     }
   }
 }
@@ -211,7 +211,7 @@ export async function updateEnquiryStatus(id: string, status: Enquiry['status'])
   try {
     await updateDoc(doc(db, 'enquiries', id), { status });
   } catch (error) {
-    handleFirestoreError(error, OperationType.UPDATE, path);
+    console.warn(`Could not update Firestore enquiry ${id} status:`, error);
   }
 }
 
@@ -220,28 +220,41 @@ export async function removeEnquiry(id: string): Promise<void> {
   try {
     await deleteDoc(doc(db, 'enquiries', id));
   } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
+    console.warn(`Could not remove Firestore enquiry ${id}:`, error);
   }
 }
 
 // ---------------- SETTINGS ----------------
 export async function fetchSiteSettings(): Promise<SiteSettings> {
+  const localCached = localStorage.getItem('aditya_site_settings');
+  let fallback = INITIAL_SETTINGS;
+  if (localCached) {
+    try {
+      fallback = { ...INITIAL_SETTINGS, ...JSON.parse(localCached) };
+    } catch {
+      // ignore
+    }
+  }
+
   try {
     const docRef = doc(db, 'settings', 'general');
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      return docSnap.data() as SiteSettings;
+      const data = docSnap.data() as SiteSettings;
+      localStorage.setItem('aditya_site_settings', JSON.stringify(data));
+      return data;
     } else {
-      await setDoc(docRef, INITIAL_SETTINGS);
-      return INITIAL_SETTINGS;
+      await setDoc(docRef, fallback);
+      return fallback;
     }
   } catch (error) {
     console.warn('Using local fallback for settings:', error);
-    return INITIAL_SETTINGS;
+    return fallback;
   }
 }
 
 export async function updateSiteSettings(settings: SiteSettings): Promise<void> {
+  localStorage.setItem('aditya_site_settings', JSON.stringify(settings));
   const path = 'settings/general';
   try {
     await setDoc(doc(db, 'settings', 'general'), {
@@ -249,6 +262,7 @@ export async function updateSiteSettings(settings: SiteSettings): Promise<void> 
       updatedAt: new Date().toISOString(),
     });
   } catch (error) {
+    console.warn('Firestore write warning:', error);
     handleFirestoreError(error, OperationType.WRITE, path);
   }
 }

@@ -1,39 +1,39 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Cinzel", Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cinzel", "Noto Serif Oriya", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", "Noto Sans Oriya", "Kalinga", "Utkal", ui-sans-serif, system-ui, sans-serif;
   --color-ivory: #FDFBF7;
-  --color-cream: #F5EFEB;
-  --color-gold: #D4AF37;
-  --color-gold-light: #F3E5AB;
-  --color-gold-dark: #AA820A;
+  --color-cream: #FAF6F0;
+  --color-gold: #C69214;
+  --color-gold-light: #FBF4DE;
+  --color-gold-dark: #976F0E;
   --color-forest: #143525;
   --color-forest-dark: #0B2016;
-  --color-midnight: #090D16;
-  --color-charcoal: #111622;
 }
 
 @layer base {
   body {
     font-family: var(--font-sans);
+    line-height: 1.6;
+    letter-spacing: -0.01em;
   }
 }
 
-/* Custom scrollbar */
+/* Light, clean scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f17;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #242c3d;
-  border-radius: 4px;
+  background: #cbd5e1;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b465e;
+  background: #94a3b8;
 }
 
 @keyframes pinShake {
@@ -44,5 +44,31 @@
 
 .pin-shake {
   animation: pinShake 0.4s ease-in-out;
+}
+
+/* Subtle fade in for clean lightweight transitions */
+@keyframes softFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-soft-in {
+  animation: softFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

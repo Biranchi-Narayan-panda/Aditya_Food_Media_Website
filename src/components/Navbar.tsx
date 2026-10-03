@@ -11,10 +11,20 @@ import {
   Milk,
   Film,
   PhoneCall,
+  Languages,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { currentPath, navigate, getWhatsAppUrl, openAdminPortal, isAdminPinUnlocked } = useSite();
+  const {
+    currentPath,
+    navigate,
+    getWhatsAppUrl,
+    openAdminPortal,
+    isAdminPinUnlocked,
+    language,
+    setLanguage,
+    t,
+  } = useSite();
   const { isAdmin } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,7 +33,7 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 15);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -44,55 +54,62 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-200 ${
         isScrolled
-          ? 'bg-[#090d16]/95 backdrop-blur-md border-b border-amber-500/10 shadow-lg shadow-black/40 py-2.5'
-          : 'bg-gradient-to-b from-[#070a10]/95 to-transparent py-4'
+          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-sm py-2.5'
+          : 'bg-white/90 backdrop-blur-sm border-b border-slate-100 py-3.5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          {/* Logo with Official Brand Emblem */}
+        <div className="flex items-center justify-between gap-3">
+          {/* Brand Logo & Name */}
           <button
             onClick={() => handleNav('/')}
-            className="flex items-center space-x-3 text-left group focus:outline-none"
+            className="flex items-center space-x-3 text-left group focus:outline-none shrink-0"
           >
-            <div className="w-11 h-11 transition-transform group-hover:scale-105 duration-300 shrink-0">
+            <div className="w-11 h-11 transition-transform group-hover:scale-105 duration-200 shrink-0">
               <AdityaMainLogo className="w-full h-full" />
             </div>
             <div>
-              <div className="font-serif text-base sm:text-lg font-bold tracking-wider text-white group-hover:text-amber-300 transition-colors">
-                ADITYA <span className="text-amber-400 font-sans font-light text-xs sm:text-sm tracking-normal">FOOD & MEDIA</span>
+              <div className="font-serif text-base sm:text-lg font-bold tracking-tight text-slate-900 group-hover:text-amber-700 transition-colors">
+                {t.nav.brandTitle}{' '}
+                <span className="text-amber-600 font-sans font-medium text-xs sm:text-sm tracking-normal">
+                  {t.nav.brandSubtitle}
+                </span>
               </div>
-              <p className="text-[10px] text-amber-200/60 uppercase tracking-widest hidden sm:block">
-                Quality & Creativity
+              <p className="text-[10px] text-slate-500 uppercase tracking-wider hidden sm:block">
+                {t.nav.tagline}
               </p>
             </div>
           </button>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-1.5">
             <button
               onClick={() => handleNav('/')}
-              className={`px-3 py-2 text-sm font-medium transition-colors relative ${
-                isActive('/') ? 'text-amber-400 font-semibold' : 'text-slate-300 hover:text-white'
+              className={`px-3 py-2 text-sm font-medium transition-colors relative rounded-lg ${
+                isActive('/')
+                  ? 'text-amber-800 font-bold bg-amber-50/70'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              Home
+              {t.nav.home}
               {isActive('/') && (
-                <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full" />
+                <span className="absolute bottom-1 left-3 right-3 h-[2px] bg-amber-500 rounded-full" />
               )}
             </button>
 
             <button
               onClick={() => handleNav('/about')}
-              className={`px-3 py-2 text-sm font-medium transition-colors relative ${
-                isActive('/about') ? 'text-amber-400 font-semibold' : 'text-slate-300 hover:text-white'
+              className={`px-3 py-2 text-sm font-medium transition-colors relative rounded-lg ${
+                isActive('/about')
+                  ? 'text-amber-800 font-bold bg-amber-50/70'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              About Us
+              {t.nav.about}
               {isActive('/about') && (
-                <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full" />
+                <span className="absolute bottom-1 left-3 right-3 h-[2px] bg-amber-500 rounded-full" />
               )}
             </button>
 
@@ -104,45 +121,53 @@ export const Navbar: React.FC = () => {
             >
               <button
                 onClick={() => handleNav('/foods')}
-                className={`flex items-center space-x-1.5 px-3 py-2 text-sm font-medium transition-colors relative ${
-                  isActive('/foods') ? 'text-emerald-400 font-semibold' : 'text-slate-300 hover:text-white'
+                className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-colors relative rounded-lg ${
+                  isActive('/foods')
+                    ? 'text-emerald-800 font-bold bg-emerald-50/70'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                <Milk className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Aditya Foods</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${foodsDropdownOpen ? 'rotate-180' : ''}`} />
+                <Milk className="w-4 h-4 text-emerald-600" />
+                <span>{t.nav.foods}</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 text-slate-400 ${
+                    foodsDropdownOpen ? 'rotate-180 text-emerald-600' : ''
+                  }`}
+                />
                 {isActive('/foods') && (
-                  <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-gradient-to-r from-emerald-400 to-amber-400 rounded-full" />
+                  <span className="absolute bottom-1 left-3 right-3 h-[2px] bg-emerald-500 rounded-full" />
                 )}
               </button>
 
               {foodsDropdownOpen && (
-                <div className="absolute top-full left-0 w-64 pt-2 z-50">
-                  <div className="bg-[#0f1422] border border-emerald-500/20 rounded-xl shadow-2xl p-3 backdrop-blur-xl">
-                    <div className="flex items-center space-x-2 px-2 pb-2 mb-2 border-b border-white/5">
-                      <AdityaFoodsBadge className="w-16 h-auto" />
-                      <div className="text-[11px] text-emerald-400 font-semibold">Official Division</div>
+                <div className="absolute top-full left-0 w-64 pt-1.5 z-50">
+                  <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-2.5 animate-soft-in">
+                    <div className="flex items-center space-x-2 px-2.5 py-1.5 mb-1.5 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                      <AdityaFoodsBadge className="w-14 h-auto" />
+                      <div className="text-[11px] text-emerald-800 font-semibold">
+                        {t.nav.officialDivision}
+                      </div>
                     </div>
                     <button
                       onClick={() => handleNav('/foods')}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-emerald-950/40 hover:text-emerald-300 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition-colors"
                     >
-                      <div className="font-medium">Foods Overview</div>
-                      <div className="text-xs text-slate-400">Our dairy philosophy & values</div>
+                      <div className="font-semibold text-slate-900">{t.nav.foodsOverview}</div>
+                      <div className="text-xs text-slate-500">{t.about.heritageTitle}</div>
                     </button>
                     <button
                       onClick={() => handleNav('/foods/products')}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-emerald-950/40 hover:text-emerald-300 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition-colors"
                     >
-                      <div className="font-medium">Dairy Products</div>
-                      <div className="text-xs text-slate-400">Milk, Ghee, Butter, Paneer, Curd</div>
+                      <div className="font-semibold text-slate-900">{t.nav.dairyProducts}</div>
+                      <div className="text-xs text-slate-500">Milk, Ghee, Butter, Paneer, Curd</div>
                     </button>
                     <button
                       onClick={() => handleNav('/foods/consultation')}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-emerald-950/40 hover:text-emerald-300 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition-colors"
                     >
-                      <div className="font-medium">Food Consultation</div>
-                      <div className="text-xs text-slate-400">Processing, packaging & distribution</div>
+                      <div className="font-semibold text-slate-900">{t.nav.foodConsultation}</div>
+                      <div className="text-xs text-slate-500">{t.consultation.badge}</div>
                     </button>
                   </div>
                 </div>
@@ -157,45 +182,53 @@ export const Navbar: React.FC = () => {
             >
               <button
                 onClick={() => handleNav('/media')}
-                className={`flex items-center space-x-1.5 px-3 py-2 text-sm font-medium transition-colors relative ${
-                  isActive('/media') ? 'text-amber-400 font-semibold' : 'text-slate-300 hover:text-white'
+                className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium transition-colors relative rounded-lg ${
+                  isActive('/media')
+                    ? 'text-amber-800 font-bold bg-amber-50/70'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                <Film className="w-3.5 h-3.5 text-amber-400" />
-                <span>Aditya Media</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${mediaDropdownOpen ? 'rotate-180' : ''}`} />
+                <Film className="w-4 h-4 text-amber-600" />
+                <span>{t.nav.media}</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 text-slate-400 ${
+                    mediaDropdownOpen ? 'rotate-180 text-amber-600' : ''
+                  }`}
+                />
                 {isActive('/media') && (
-                  <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-gradient-to-r from-amber-400 to-indigo-400 rounded-full" />
+                  <span className="absolute bottom-1 left-3 right-3 h-[2px] bg-amber-500 rounded-full" />
                 )}
               </button>
 
               {mediaDropdownOpen && (
-                <div className="absolute top-full left-0 w-64 pt-2 z-50">
-                  <div className="bg-[#0f1422] border border-amber-500/20 rounded-xl shadow-2xl p-3 backdrop-blur-xl">
-                    <div className="flex items-center space-x-2 px-2 pb-2 mb-2 border-b border-white/5">
-                      <AdityaMediaBadge className="w-16 h-auto" />
-                      <div className="text-[11px] text-amber-400 font-semibold">Official Division</div>
+                <div className="absolute top-full left-0 w-64 pt-1.5 z-50">
+                  <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-2.5 animate-soft-in">
+                    <div className="flex items-center space-x-2 px-2.5 py-1.5 mb-1.5 bg-amber-50/50 rounded-xl border border-amber-100">
+                      <AdityaMediaBadge className="w-14 h-auto" />
+                      <div className="text-[11px] text-amber-800 font-semibold">
+                        {t.nav.officialDivision}
+                      </div>
                     </div>
                     <button
                       onClick={() => handleNav('/media')}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-amber-950/40 hover:text-amber-300 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition-colors"
                     >
-                      <div className="font-medium">Media Overview</div>
-                      <div className="text-xs text-slate-400">Cinematic storytelling & services</div>
+                      <div className="font-semibold text-slate-900">{t.nav.mediaOverview}</div>
+                      <div className="text-xs text-slate-500">{t.media.heroSubtitle.slice(0, 35)}...</div>
                     </button>
                     <button
                       onClick={() => handleNav('/media/videos')}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-amber-950/40 hover:text-amber-300 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-amber-50 hover:text-amber-900 transition-colors"
                     >
-                      <div className="font-medium">Video Gallery</div>
-                      <div className="text-xs text-slate-400">Interactive YouTube showcase</div>
+                      <div className="font-semibold text-slate-900">{t.nav.videoGallery}</div>
+                      <div className="text-xs text-slate-500">{t.media.latestReelsTitle}</div>
                     </button>
                     <button
                       onClick={() => handleNav('/media/portfolio')}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-amber-950/40 hover:text-amber-300 transition-colors"
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition-colors"
                     >
-                      <div className="font-medium">Media Portfolio</div>
-                      <div className="text-xs text-slate-400">Broadcast, films & music reels</div>
+                      <div className="font-semibold text-slate-900">{t.nav.mediaPortfolio}</div>
+                      <div className="text-xs text-slate-500">{t.media.portfolioHeading}</div>
                     </button>
                   </div>
                 </div>
@@ -204,66 +237,116 @@ export const Navbar: React.FC = () => {
 
             <button
               onClick={() => handleNav('/contact')}
-              className={`px-3 py-2 text-sm font-medium transition-colors relative ${
-                isActive('/contact') ? 'text-amber-400 font-semibold' : 'text-slate-300 hover:text-white'
+              className={`px-3 py-2 text-sm font-medium transition-colors relative rounded-lg ${
+                isActive('/contact')
+                  ? 'text-amber-800 font-bold bg-amber-50/70'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              Contact Us
+              {t.nav.contact}
               {isActive('/contact') && (
-                <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-gradient-to-r from-amber-400 to-emerald-400 rounded-full" />
+                <span className="absolute bottom-1 left-3 right-3 h-[2px] bg-amber-500 rounded-full" />
               )}
             </button>
           </nav>
 
-          {/* Right Action Buttons */}
-          <div className="hidden lg:flex items-center space-x-3">
-            {/* WhatsApp Direct Action */}
+          {/* Right Action Cluster */}
+          <div className="hidden lg:flex items-center space-x-2.5">
+            {/* Language Switcher Segmented Control */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setLanguage('or')}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  language === 'or'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60 font-bold'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+                title="ଓଡ଼ିଆ ଭାଷା ଚୟନ କରନ୍ତୁ"
+              >
+                ଓଡ଼ିଆ
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all ${
+                  language === 'en'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60 font-bold'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+                title="Switch to English"
+              >
+                English
+              </button>
+            </div>
+
+            {/* WhatsApp Link */}
             <a
-              href={getWhatsAppUrl('Hello Aditya Food & Media, I would like to get in touch.')}
+              href={getWhatsAppUrl(
+                language === 'or'
+                  ? 'ନମସ୍କାର ଆଦିତ୍ୟ ଫୁଡ୍ସ ଏବଂ ମିଡିଆ, ମୁଁ ଉତ୍ପାଦ ଏବଂ ସେବା ସମ୍ବନ୍ଧରେ ଜାଣିବାକୁ ଚାହେଁ।'
+                  : 'Hello Aditya Food & Media, I would like to get in touch.'
+              )}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-full bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-600 hover:text-white transition-all shadow-sm group"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition-colors shadow-xs"
             >
-              <MessageCircle className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white" />
-              <span>WhatsApp</span>
+              <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{t.nav.whatsapp}</span>
             </a>
 
             {/* Quick Contact CTA */}
             <button
               onClick={() => handleNav('/contact')}
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-semibold text-xs hover:from-amber-400 hover:to-amber-500 shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all"
+              className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-xs transition-all"
             >
               <PhoneCall className="w-3.5 h-3.5" />
-              <span>Get in Touch</span>
+              <span>{t.nav.getInTouch}</span>
             </button>
 
-            {/* Admin Portal Link */}
+            {/* Admin Portal Button */}
             <button
               onClick={openAdminPortal}
-              title={isAdmin && isAdminPinUnlocked ? 'Aditya Management Portal (Active)' : 'Admin Portal (PIN Protected)'}
-              className={`p-2 rounded-full border transition-all ${
+              title={
                 isAdmin && isAdminPinUnlocked
-                  ? 'border-amber-400 bg-amber-500/20 text-amber-300 ring-2 ring-amber-400/30'
-                  : 'border-white/10 text-slate-400 hover:text-white hover:border-white/30'
+                  ? t.nav.adminActive
+                  : `${t.nav.adminPortal} (PIN Protected)`
+              }
+              className={`p-2 rounded-xl border transition-all ${
+                isAdmin && isAdminPinUnlocked
+                  ? 'border-amber-400 bg-amber-50 text-amber-700'
+                  : 'border-slate-200 text-slate-400 hover:text-slate-800 hover:bg-slate-50'
               }`}
             >
               <ShieldCheck className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex items-center space-x-2 lg:hidden">
+          {/* Mobile Right Controls: Language Switcher + Admin + Hamburger */}
+          <div className="flex items-center space-x-1.5 lg:hidden">
+            {/* Compact Mobile Language Switcher */}
+            <button
+              type="button"
+              onClick={() => setLanguage(language === 'or' ? 'en' : 'or')}
+              className="flex items-center space-x-1 px-2.5 py-1.5 text-xs font-bold rounded-lg bg-amber-50 text-amber-800 border border-amber-200"
+              title={t.nav.switchLanguage}
+            >
+              <Languages className="w-3.5 h-3.5 text-amber-700" />
+              <span>{language === 'or' ? 'EN' : 'ଓଡ଼ିଆ'}</span>
+            </button>
+
             <button
               onClick={openAdminPortal}
-              className="p-2 text-slate-400 hover:text-amber-400"
-              title="Admin Portal (PIN Protected)"
+              className="p-2 text-slate-500 hover:text-slate-900 rounded-lg"
+              title={t.nav.adminPortal}
             >
               <ShieldCheck className="w-5 h-5" />
             </button>
+
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-300 hover:text-white focus:outline-none"
-              aria-label="Toggle navigation menu"
+              className="p-2 text-slate-700 hover:text-slate-900 rounded-lg focus:outline-none"
+              aria-label={t.nav.menu}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -271,109 +354,151 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#090d16]/98 border-b border-white/10 px-4 pt-3 pb-6 space-y-3 backdrop-blur-2xl">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 shadow-xl animate-soft-in">
+          {/* Mobile Language Switcher Bar */}
+          <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200 mb-2">
+            <span className="text-xs font-semibold text-slate-600 flex items-center space-x-1.5">
+              <Languages className="w-4 h-4 text-amber-600" />
+              <span>{t.nav.switchLanguage}:</span>
+            </span>
+            <div className="flex items-center space-x-1 bg-white p-0.5 rounded-lg border border-slate-200 text-xs">
+              <button
+                type="button"
+                onClick={() => setLanguage('or')}
+                className={`px-3 py-1 rounded-md font-semibold ${
+                  language === 'or'
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
+                    : 'text-slate-600'
+                }`}
+              >
+                ଓଡ଼ିଆ
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 rounded-md font-semibold ${
+                  language === 'en'
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
+                    : 'text-slate-600'
+                }`}
+              >
+                English
+              </button>
+            </div>
+          </div>
+
           <button
             onClick={() => handleNav('/')}
-            className={`w-full text-left py-2 px-3 rounded-lg text-sm ${
-              isActive('/') ? 'bg-amber-500/10 text-amber-400 font-semibold' : 'text-slate-300'
+            className={`w-full text-left py-2 px-3 rounded-xl text-sm font-semibold ${
+              isActive('/')
+                ? 'bg-amber-50 text-amber-800 font-bold'
+                : 'text-slate-700 hover:bg-slate-50'
             }`}
           >
-            Home
+            {t.nav.home}
           </button>
           <button
             onClick={() => handleNav('/about')}
-            className={`w-full text-left py-2 px-3 rounded-lg text-sm ${
-              isActive('/about') ? 'bg-amber-500/10 text-amber-400 font-semibold' : 'text-slate-300'
+            className={`w-full text-left py-2 px-3 rounded-xl text-sm font-semibold ${
+              isActive('/about')
+                ? 'bg-amber-50 text-amber-800 font-bold'
+                : 'text-slate-700 hover:bg-slate-50'
             }`}
           >
-            About Us
+            {t.nav.about}
           </button>
 
-          <div className="pt-2 border-t border-white/5 space-y-1">
+          <div className="pt-2 border-t border-slate-100 space-y-1">
             <div className="px-3 py-1 flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center space-x-1.5">
-                <Milk className="w-3.5 h-3.5" />
-                <span>Aditya Foods</span>
+              <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center space-x-1.5">
+                <Milk className="w-4 h-4 text-emerald-600" />
+                <span>{t.nav.foods}</span>
               </span>
-              <AdityaFoodsBadge className="w-14 h-auto" />
+              <AdityaFoodsBadge className="w-12 h-auto" />
             </div>
             <button
               onClick={() => handleNav('/foods')}
-              className="w-full text-left py-1.5 px-3 text-sm text-slate-300 hover:text-white pl-6"
+              className="w-full text-left py-1.5 px-3 text-sm text-slate-600 hover:text-slate-900 pl-6 rounded-lg"
             >
-              Foods Overview
+              {t.nav.foodsOverview}
             </button>
             <button
               onClick={() => handleNav('/foods/products')}
-              className="w-full text-left py-1.5 px-3 text-sm text-slate-300 hover:text-white pl-6"
+              className="w-full text-left py-1.5 px-3 text-sm text-slate-600 hover:text-slate-900 pl-6 rounded-lg"
             >
-              Dairy Products (Milk, Ghee, Paneer)
+              {t.nav.dairyProducts}
             </button>
             <button
               onClick={() => handleNav('/foods/consultation')}
-              className="w-full text-left py-1.5 px-3 text-sm text-slate-300 hover:text-white pl-6"
+              className="w-full text-left py-1.5 px-3 text-sm text-slate-600 hover:text-slate-900 pl-6 rounded-lg"
             >
-              Food Consultation
+              {t.nav.foodConsultation}
             </button>
           </div>
 
-          <div className="pt-2 border-t border-white/5 space-y-1">
+          <div className="pt-2 border-t border-slate-100 space-y-1">
             <div className="px-3 py-1 flex items-center justify-between">
-              <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
-                <Film className="w-3.5 h-3.5" />
-                <span>Aditya Media</span>
+              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center space-x-1.5">
+                <Film className="w-4 h-4 text-amber-600" />
+                <span>{t.nav.media}</span>
               </span>
-              <AdityaMediaBadge className="w-14 h-auto" />
+              <AdityaMediaBadge className="w-12 h-auto" />
             </div>
             <button
               onClick={() => handleNav('/media')}
-              className="w-full text-left py-1.5 px-3 text-sm text-slate-300 hover:text-white pl-6"
+              className="w-full text-left py-1.5 px-3 text-sm text-slate-600 hover:text-slate-900 pl-6 rounded-lg"
             >
-              Media Overview
+              {t.nav.mediaOverview}
             </button>
             <button
               onClick={() => handleNav('/media/videos')}
-              className="w-full text-left py-1.5 px-3 text-sm text-slate-300 hover:text-white pl-6"
+              className="w-full text-left py-1.5 px-3 text-sm text-slate-600 hover:text-slate-900 pl-6 rounded-lg"
             >
-              Interactive Video Gallery
+              {t.nav.videoGallery}
             </button>
             <button
               onClick={() => handleNav('/media/portfolio')}
-              className="w-full text-left py-1.5 px-3 text-sm text-slate-300 hover:text-white pl-6"
+              className="w-full text-left py-1.5 px-3 text-sm text-slate-600 hover:text-slate-900 pl-6 rounded-lg"
             >
-              Media Portfolio & Projects
+              {t.nav.mediaPortfolio}
             </button>
           </div>
 
-          <div className="pt-2 border-t border-white/5">
+          <div className="pt-2 border-t border-slate-100">
             <button
               onClick={() => handleNav('/contact')}
-              className={`w-full text-left py-2 px-3 rounded-lg text-sm ${
-                isActive('/contact') ? 'bg-amber-500/10 text-amber-400 font-semibold' : 'text-slate-300'
+              className={`w-full text-left py-2 px-3 rounded-xl text-sm font-semibold ${
+                isActive('/contact')
+                  ? 'bg-amber-50 text-amber-800 font-bold'
+                  : 'text-slate-700 hover:bg-slate-50'
               }`}
             >
-              Contact Us
+              {t.nav.contact}
             </button>
           </div>
 
           <div className="pt-3 grid grid-cols-2 gap-2">
             <a
-              href={getWhatsAppUrl()}
+              href={getWhatsAppUrl(
+                language === 'or'
+                  ? 'ନମସ୍କାର ଆଦିତ୍ୟ ଫୁଡ୍ସ ଏବଂ ମିଡିଆ'
+                  : 'Hello Aditya Food & Media'
+              )}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 py-2.5 rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold"
+              className="flex items-center justify-center space-x-1.5 py-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold"
             >
-              <MessageCircle className="w-4 h-4 text-emerald-400" />
-              <span>WhatsApp</span>
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              <span>{t.nav.whatsapp}</span>
             </a>
             <button
               onClick={() => handleNav('/contact')}
-              className="flex items-center justify-center space-x-2 py-2.5 rounded-lg bg-amber-500 text-slate-950 font-semibold text-xs"
+              className="flex items-center justify-center space-x-1.5 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs"
             >
               <PhoneCall className="w-4 h-4" />
-              <span>Get in Touch</span>
+              <span>{t.nav.getInTouch}</span>
             </button>
           </div>
         </div>

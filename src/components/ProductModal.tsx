@@ -3,7 +3,7 @@ import { useSite } from '../context/SiteContext';
 import { X, MessageCircle, CheckCircle2, Package, Shield, Sparkles } from 'lucide-react';
 
 export const ProductModal: React.FC = () => {
-  const { activeProduct, setActiveProduct, getWhatsAppUrl, navigate } = useSite();
+  const { activeProduct, setActiveProduct, getWhatsAppUrl, navigate, getProductLocalized, t, language } = useSite();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -21,26 +21,36 @@ export const ProductModal: React.FC = () => {
 
   if (!activeProduct) return null;
 
-  const whatsappMessage = `Hello Aditya Food & Media, I am interested in placing an order or enquiry for ${activeProduct.name} (${activeProduct.packaging || 'Standard Packaging'}). Please provide availability and pricing details.`;
+  const localized = getProductLocalized(activeProduct);
+
+  const whatsappMessage =
+    language === 'or'
+      ? `ନମସ୍କାର ଆଦିତ୍ୟ ଫୁଡ୍ସ, ମୁଁ ${localized.name} (${localized.packaging || 'ଦୁଗ୍ଧଜାତ ସାମଗ୍ରୀ'}) କ୍ରୟ କିମ୍ବା ଅର୍ଡର କରିବାକୁ ଚାହେଁ। ଦୟାକରି ମୂଲ୍ୟ ଏବଂ ଯୋଗାଣ ବିବରଣୀ ପ୍ରଦାନ କରନ୍ତୁ।`
+      : `Hello Aditya Food & Media, I am interested in placing an order or enquiry for ${localized.name} (${localized.packaging || 'Standard Packaging'}). Please provide availability and pricing details.`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={() => setActiveProduct(null)}
+    >
       <div
-        className="relative w-full max-w-3xl bg-[#0d121c] border border-emerald-500/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-3xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#090d16]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/70">
           <div className="flex items-center space-x-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider border border-emerald-500/30">
-              {activeProduct.category}
+            <span className="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
+              {localized.category}
             </span>
-            <span className="text-xs text-slate-400 hidden sm:inline">Verified Dairy Quality</span>
+            <span className="text-xs text-slate-500 hidden sm:inline">
+              {t.foods.badge}
+            </span>
           </div>
           <button
             onClick={() => setActiveProduct(null)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="Close modal"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+            aria-label={t.common.close}
           >
             <X className="w-5 h-5" />
           </button>
@@ -50,43 +60,43 @@ export const ProductModal: React.FC = () => {
         <div className="overflow-y-auto p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             {/* Image */}
-            <div className="relative aspect-4/3 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shadow-lg">
+            <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm">
               <img
                 src={activeProduct.imageUrl}
-                alt={activeProduct.name}
-                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                alt={localized.name}
+                className="w-full h-full object-cover"
               />
-              <div className="absolute top-3 left-3 bg-emerald-950/80 backdrop-blur-sm border border-emerald-500/30 px-2.5 py-1 rounded-full text-[11px] font-medium text-emerald-300 flex items-center space-x-1">
-                <Sparkles className="w-3 h-3 text-emerald-400" />
+              <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs border border-slate-200 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-emerald-800 flex items-center space-x-1 shadow-xs">
+                <Sparkles className="w-3 h-3 text-emerald-600" />
                 <span>100% Pure & Fresh</span>
               </div>
             </div>
 
             {/* Details */}
             <div className="space-y-4">
-              <h2 className="font-serif text-2xl font-bold text-white">
-                {activeProduct.name}
+              <h2 className="font-serif text-2xl font-bold text-slate-900">
+                {localized.name}
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                {activeProduct.description}
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {localized.description}
               </p>
 
-              {activeProduct.packaging && (
-                <div className="flex items-start space-x-2 text-xs text-slate-300 bg-white/5 p-3 rounded-lg border border-white/5">
-                  <Package className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              {localized.packaging && (
+                <div className="flex items-start space-x-2.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                  <Package className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-white">Available Packaging: </span>
-                    {activeProduct.packaging}
+                    <span className="font-semibold text-slate-900">{t.foods.packaging}: </span>
+                    {localized.packaging}
                   </div>
                 </div>
               )}
 
-              {activeProduct.availability && (
-                <div className="flex items-start space-x-2 text-xs text-emerald-300 bg-emerald-950/20 p-3 rounded-lg border border-emerald-500/20">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              {localized.availability && (
+                <div className="flex items-start space-x-2.5 text-xs text-emerald-900 bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-white">Supply Status: </span>
-                    {activeProduct.availability}
+                    <span className="font-semibold text-emerald-950">{t.foods.availability}: </span>
+                    {localized.availability}
                   </div>
                 </div>
               )}
@@ -95,27 +105,27 @@ export const ProductModal: React.FC = () => {
 
           {/* Specifications */}
           {activeProduct.specifications && (
-            <div className="space-y-2 pt-2 border-t border-white/10">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-1.5">
-                <Shield className="w-4 h-4 text-emerald-400" />
-                <span>Product Specifications & Quality Standards</span>
+            <div className="space-y-2 pt-2 border-t border-slate-100">
+              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+                <Shield className="w-4 h-4 text-emerald-600" />
+                <span>{t.foods.specifications}</span>
               </h4>
-              <p className="text-xs text-slate-300 leading-relaxed bg-[#080b12] p-3.5 rounded-xl border border-white/5">
+              <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
                 {activeProduct.specifications}
               </p>
             </div>
           )}
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
             <a
               href={getWhatsAppUrl(whatsappMessage)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-colors shadow-lg shadow-emerald-600/20"
+              className="flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors shadow-xs"
             >
               <MessageCircle className="w-4 h-4" />
-              <span>Enquire on WhatsApp</span>
+              <span>{t.foods.orderWhatsApp}</span>
             </a>
 
             <button
@@ -123,9 +133,9 @@ export const ProductModal: React.FC = () => {
                 setActiveProduct(null);
                 navigate('/contact');
               }}
-              className="flex-1 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition-colors border border-white/10"
+              className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-colors border border-slate-200 cursor-pointer"
             >
-              Send Detailed Inquiry
+              {t.nav.getInTouch}
             </button>
           </div>
         </div>

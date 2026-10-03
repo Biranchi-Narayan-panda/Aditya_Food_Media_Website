@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSite } from '../context/SiteContext';
 import { submitEnquiry } from '../firebase/services';
+import { saveAppointmentToSuperbase } from '../supabase/client';
 import {
   Phone,
   Mail,
@@ -9,16 +10,12 @@ import {
   Send,
   CheckCircle2,
   AlertCircle,
-  Youtube,
-  Instagram,
-  Facebook,
-  Linkedin,
-  Twitter,
   Clock,
+  Database,
 } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
-  const { settings, getWhatsAppUrl } = useSite();
+  const { settings, getWhatsAppUrl, t, language } = useSite();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,6 +26,7 @@ export const ContactPage: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [superbaseSynced, setSuperbaseSynced] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,12 +34,33 @@ export const ContactPage: React.FC = () => {
     setErrorMessage(null);
 
     if (!name.trim() || !email.trim() || !phone.trim() || !message.trim()) {
-      setErrorMessage('Please fill in all mandatory fields.');
+      setErrorMessage(
+        language === 'or'
+          ? 'ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।'
+          : 'Please fill in all mandatory fields.'
+      );
       return;
     }
 
     setSubmitting(true);
     try {
+      // 1. Save to SuperBase
+      const superbaseResult = await saveAppointmentToSuperbase({
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        consultationTopic: enquiryType,
+        preferredContact,
+        message: message.trim(),
+        source: 'Contact Page Form',
+        status: 'pending',
+      });
+
+      if (superbaseResult.success) {
+        setSuperbaseSynced(true);
+      }
+
+      // 2. Also save to app database
       const res = await submitEnquiry({
         name: name.trim(),
         email: email.trim(),
@@ -58,337 +77,264 @@ export const ContactPage: React.FC = () => {
       setMessage('');
     } catch (err) {
       console.error('Submission error:', err);
-      setErrorMessage('Failed to deliver message. Please contact us via phone or WhatsApp directly.');
+      setErrorMessage(t.contact.errorMessage);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="pt-24 pb-20 space-y-16">
+    <div className="pt-28 pb-20 space-y-14">
       {/* Header */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 pt-6">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-amber-300 text-xs font-semibold uppercase tracking-widest">
-          <Phone className="w-3.5 h-3.5 text-amber-400" />
-          <span>Direct Communication</span>
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 pt-4">
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold uppercase tracking-wider">
+          <Phone className="w-3.5 h-3.5 text-amber-600" />
+          <span>{t.contact.badge}</span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-white">
-          Contact Aditya Food & Media
+        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+          {t.contact.heroTitle}
         </h1>
 
-        <p className="text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Whether you are inquiring about daily dairy supplies, exploring food business consultation, or initiating a media collaboration, our team is at your service.
+        <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          {t.contact.heroSubtitle}
         </p>
       </section>
 
       {/* Main Grid: Details + Form */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Contact Details Card */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-[#0e1422] border border-white/10 rounded-3xl p-6 sm:p-8 space-y-6">
-              <h3 className="font-serif text-xl font-bold text-white">
-                Contact Information
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+              <h3 className="font-serif text-xl font-bold text-slate-900">
+                {t.contact.touchTitle}
               </h3>
 
-              <div className="space-y-4 text-sm text-slate-300">
-                <div className="flex items-start space-x-3 bg-white/5 p-4 rounded-xl border border-white/5">
-                  <Phone className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-3.5 text-sm text-slate-700">
+                <div className="flex items-start space-x-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                  <Phone className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="block text-xs uppercase text-slate-400 font-semibold">
-                      Telephone
+                    <span className="block text-xs uppercase text-slate-500 font-bold">
+                      {t.contact.phoneLabel}
                     </span>
                     <a
                       href={`tel:${settings.phone || '0674-2915041'}`}
-                      className="text-white font-medium hover:text-amber-300 transition-colors"
+                      className="text-slate-900 hover:text-amber-700 font-semibold"
                     >
                       {settings.phone || '0674-2915041'}
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-white/5 p-4 rounded-xl border border-white/5">
-                  <Mail className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                  <Mail className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="block text-xs uppercase text-slate-400 font-semibold">
-                      Official Email
+                    <span className="block text-xs uppercase text-slate-500 font-bold">
+                      {t.contact.emailLabel}
                     </span>
                     <a
                       href={`mailto:${settings.email || 'personal@adityafoodsandmedia.com'}`}
-                      className="text-white font-medium hover:text-emerald-300 transition-colors break-all"
+                      className="text-slate-900 hover:text-emerald-700 font-semibold break-all"
                     >
                       {settings.email || 'personal@adityafoodsandmedia.com'}
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-white/5 p-4 rounded-xl border border-white/5">
-                  <MapPin className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                  <MapPin className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="block text-xs uppercase text-slate-400 font-semibold">
-                      Headquarters
+                    <span className="block text-xs uppercase text-slate-500 font-bold">
+                      {t.contact.officeLabel}
                     </span>
-                    <span className="text-white font-medium leading-relaxed">
-                      {settings.address || 'Aditya Tower, Chandrasekharpur, Bhubaneswar, Odisha 751024'}
+                    <span className="text-slate-800 leading-relaxed text-xs">
+                      {settings.address || 'Aditya Tower, Bhubaneswar, Odisha 751024'}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-white/5 p-4 rounded-xl border border-white/5">
-                  <Clock className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                  <Clock className="w-5 h-5 text-slate-500 shrink-0 mt-0.5" />
                   <div>
-                    <span className="block text-xs uppercase text-slate-400 font-semibold">
-                      Business Hours
+                    <span className="block text-xs uppercase text-slate-500 font-bold">
+                      {t.contact.hoursLabel}
                     </span>
-                    <span className="text-white font-medium">
-                      Mon – Sat: 9:00 AM – 7:00 PM IST
+                    <span className="text-slate-800 text-xs">
+                      {t.contact.hoursValue}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Direct WhatsApp CTA */}
+              {/* Instant WhatsApp Action */}
               <div className="pt-2">
                 <a
-                  href={getWhatsAppUrl('Hello Aditya Food & Media, I would like to enquire about your services.')}
+                  href={getWhatsAppUrl(
+                    language === 'or'
+                      ? 'ନମସ୍କାର ଆଦିତ୍ୟ ଫୁଡ୍ସ ଏବଂ ମିଡିଆ, ମୁଁ ସମ୍ପର୍କ କରିବାକୁ ଚାହେଁ।'
+                      : 'Hello Aditya Food & Media, I would like to get in touch.'
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center space-x-2 w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-colors shadow-lg shadow-emerald-600/20"
+                  className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Instant WhatsApp Chat</span>
+                  <span>{t.contact.whatsappAction}</span>
                 </a>
-              </div>
-
-              {/* Social Channels */}
-              <div className="pt-4 border-t border-white/10">
-                <span className="block text-xs text-slate-400 uppercase font-semibold mb-3">
-                  Connect on Social Media
-                </span>
-                <div className="flex items-center space-x-3">
-                  {settings.youtube && (
-                    <a
-                      href={settings.youtube}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-white/5 hover:bg-red-600/20 text-slate-300 hover:text-red-400 flex items-center justify-center transition-colors border border-white/5"
-                    >
-                      <Youtube className="w-4 h-4" />
-                    </a>
-                  )}
-                  {settings.instagram && (
-                    <a
-                      href={settings.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-white/5 hover:bg-pink-600/20 text-slate-300 hover:text-pink-400 flex items-center justify-center transition-colors border border-white/5"
-                    >
-                      <Instagram className="w-4 h-4" />
-                    </a>
-                  )}
-                  {settings.facebook && (
-                    <a
-                      href={settings.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-white/5 hover:bg-blue-600/20 text-slate-300 hover:text-blue-400 flex items-center justify-center transition-colors border border-white/5"
-                    >
-                      <Facebook className="w-4 h-4" />
-                    </a>
-                  )}
-                  {settings.linkedin && (
-                    <a
-                      href={settings.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-white/5 hover:bg-sky-600/20 text-slate-300 hover:text-sky-400 flex items-center justify-center transition-colors border border-white/5"
-                    >
-                      <Linkedin className="w-4 h-4" />
-                    </a>
-                  )}
-                  {settings.xTwitter && (
-                    <a
-                      href={settings.xTwitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors border border-white/5"
-                    >
-                      <Twitter className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Form Card */}
+          {/* Contact & Enquiry Form */}
           <div className="lg:col-span-3">
-            <div className="bg-[#0e1422] border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl">
-              <h2 className="font-serif text-2xl font-bold text-white mb-2">
-                Send Us a Message
-              </h2>
-              <p className="text-xs text-slate-400 mb-6">
-                Fill in the form below and your message will be dispatched directly to our executive team.
-              </p>
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xs">
+              <div className="mb-6 space-y-1">
+                <h3 className="font-serif text-2xl font-bold text-slate-900">
+                  {t.contact.formTitle}
+                </h3>
+                <p className="text-xs text-slate-600">
+                  {t.contact.formSubtitle}
+                </p>
+              </div>
 
-              {successId ? (
-                <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-2xl p-8 text-center space-y-4">
-                  <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-8 h-8" />
+              {successId && (
+                <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm flex items-start space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <span className="font-bold">{t.contact.successMessage}</span>
+                    <p className="text-xs text-emerald-800">
+                      Reference ID: <span className="font-mono font-semibold">{successId}</span>
+                    </p>
+                    <div className="flex items-center space-x-1.5 pt-0.5 text-[11px] text-emerald-700">
+                      <Database className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>
+                        {superbaseSynced
+                          ? 'Inquiry successfully saved to SuperBase backend table.'
+                          : 'Inquiry received & synced with backend.'}
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="font-serif text-xl font-bold text-white">
-                    Message Successfully Sent!
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                    Thank you for reaching out. Your enquiry tracking ID is <span className="font-mono text-emerald-400 font-semibold">{successId}</span>. We will respond promptly.
-                  </p>
-                  <button
-                    onClick={() => setSuccessId(null)}
-                    className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs font-semibold"
-                  >
-                    Send Another Message
-                  </button>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {errorMessage && (
-                    <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-center space-x-2">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{errorMessage}</span>
-                    </div>
-                  )}
+              )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Your Name"
-                        className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
-                      />
-                    </div>
+              {errorMessage && (
+                <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="yourname@domain.com"
-                        className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                        Phone / WhatsApp *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+91 00000 00000"
-                        className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                        Enquiry Nature
-                      </label>
-                      <select
-                        value={enquiryType}
-                        onChange={(e) => setEnquiryType(e.target.value as any)}
-                        className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 transition-colors"
-                      >
-                        <option value="product">Aditya Foods Dairy Products</option>
-                        <option value="consultation">Food Business Consultation</option>
-                        <option value="media">Aditya Media & Cinema Production</option>
-                        <option value="general">General Corporate Enquiry</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                      Preferred Reply Channel
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t.contact.fullName} *
                     </label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="contactMethod"
-                          checked={preferredContact === 'whatsapp'}
-                          onChange={() => setPreferredContact('whatsapp')}
-                          className="accent-amber-400"
-                        />
-                        <span>WhatsApp</span>
-                      </label>
-                      <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="contactMethod"
-                          checked={preferredContact === 'phone'}
-                          onChange={() => setPreferredContact('phone')}
-                          className="accent-amber-400"
-                        />
-                        <span>Phone Call</span>
-                      </label>
-                      <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="contactMethod"
-                          checked={preferredContact === 'email'}
-                          onChange={() => setPreferredContact('email')}
-                          className="accent-amber-400"
-                        />
-                        <span>Email</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                      Message / Inquiry Details *
-                    </label>
-                    <textarea
+                    <input
+                      type="text"
                       required
-                      rows={5}
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Please specify your product quantities, project requirements, or any questions..."
-                      className="w-full bg-[#080b12] border border-white/10 rounded-xl p-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Priyabrata Nayak"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t.contact.email} *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@domain.com"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t.contact.phone} *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 94370 00000"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t.contact.subjectType}
+                    </label>
+                    <select
+                      value={enquiryType}
+                      onChange={(e) => setEnquiryType(e.target.value as any)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
+                    >
+                      <option value="product">{t.contact.typeProduct}</option>
+                      <option value="consultation">{t.contact.typeConsultation}</option>
+                      <option value="media">{t.contact.typeMedia}</option>
+                      <option value="general">{t.contact.typeGeneral}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Preferred Response Method
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['whatsapp', 'phone', 'email'] as const).map((method) => (
+                      <button
+                        key={method}
+                        type="button"
+                        onClick={() => setPreferredContact(method)}
+                        className={`py-2 px-2 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
+                          preferredContact === method
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                            : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {method}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    {t.contact.message} *
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Write your message here..."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
+                  />
+                </div>
+
+                <div className="pt-2">
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
+                    className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 py-3 px-8 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-xs disabled:opacity-50 cursor-pointer"
                   >
-                    {submitting ? (
-                      <span>Sending Message...</span>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        <span>Submit Enquiry</span>
-                      </>
-                    )}
+                    <Send className="w-4 h-4" />
+                    <span>{submitting ? t.contact.submitting : t.contact.submitBtn}</span>
                   </button>
-                </form>
-              )}
+                </div>
+              </form>
             </div>
           </div>
         </div>

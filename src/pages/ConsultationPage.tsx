@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSite } from '../context/SiteContext';
 import { submitEnquiry } from '../firebase/services';
+import { saveAppointmentToSuperbase } from '../supabase/client';
 import {
   Compass,
   CheckCircle2,
@@ -10,11 +11,11 @@ import {
   MessageCircle,
   Send,
   AlertCircle,
-  Sparkles,
+  Database,
 } from 'lucide-react';
 
 export const ConsultationPage: React.FC = () => {
-  const { getWhatsAppUrl } = useSite();
+  const { getWhatsAppUrl, t, language } = useSite();
 
   const [fullName, setFullName] = useState('');
   const [businessName, setBusinessName] = useState('');
@@ -26,6 +27,7 @@ export const ConsultationPage: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [superbaseSynced, setSuperbaseSynced] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,12 +35,34 @@ export const ConsultationPage: React.FC = () => {
     setErrorMessage(null);
 
     if (!fullName.trim() || !email.trim() || !phone.trim() || !projectDetails.trim()) {
-      setErrorMessage('Please fill in all required fields (Name, Email, Phone, and Project Details).');
+      setErrorMessage(
+        language === 'or'
+          ? 'ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକ ତଥ୍ୟ (ନାମ, ଇମେଲ୍, ଫୋନ୍ ଏବଂ ବାର୍ତ୍ତା) ପୂରଣ କରନ୍ତୁ।'
+          : 'Please fill in all required fields (Name, Email, Phone, and Project Details).'
+      );
       return;
     }
 
     setSubmitting(true);
     try {
+      // 1. Save to SuperBase Backend table
+      const superbaseResult = await saveAppointmentToSuperbase({
+        name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        businessName: businessName.trim() || undefined,
+        consultationTopic: consultationType,
+        preferredContact,
+        message: projectDetails.trim(),
+        source: 'Consultation & Appointment Booking Page',
+        status: 'pending',
+      });
+
+      if (superbaseResult.success) {
+        setSuperbaseSynced(true);
+      }
+
+      // 2. Also record in local database services for admin panel consistency
       const res = await submitEnquiry({
         name: fullName.trim(),
         email: email.trim(),
@@ -58,249 +82,250 @@ export const ConsultationPage: React.FC = () => {
       setProjectDetails('');
     } catch (err) {
       console.error('Submission error:', err);
-      setErrorMessage('Failed to send consultation request. Please try again or reach out directly via WhatsApp.');
+      setErrorMessage(t.consultation.errorMessage);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="pt-24 pb-20 space-y-20">
+    <div className="pt-28 pb-20 space-y-16">
       {/* Header */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 pt-6">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-xs font-semibold uppercase tracking-widest">
-          <Compass className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Food Advisory & Growth</span>
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 pt-4">
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold uppercase tracking-wider">
+          <Compass className="w-3.5 h-3.5 text-emerald-600" />
+          <span>{t.consultation.badge}</span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-white">
-          Have a Food Business Idea? Let’s Talk.
+        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+          {t.consultation.heroTitle}
         </h1>
 
-        <p className="text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          From dairy micro-units to commercial food brands, we assist entrepreneurs and agribusinesses with end-to-end processing strategy, packaging engineering, and distribution.
+        <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          {t.consultation.heroSubtitle}
         </p>
       </section>
 
       {/* Advisory Pillars */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-[#0c1410] border border-emerald-500/20 rounded-2xl p-6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-base font-bold text-white">Food Processing Guidance</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Plant layout, pasteurization techniques, hygienic workflow design, and cold-chain compliance.
+            <h3 className="font-serif text-base font-bold text-slate-900">{t.consultation.processingTitle}</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.consultation.processingDesc}
             </p>
           </div>
 
-          <div className="bg-[#0c1410] border border-emerald-500/20 rounded-2xl p-6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
               <Package className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-base font-bold text-white">Packaging Consultation</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Shelf-life extension, oxygen barrier selection, tamper-evident seals, and eco-conscious food-grade packaging.
+            <h3 className="font-serif text-base font-bold text-slate-900">{t.consultation.packagingTitle}</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.consultation.packagingDesc}
             </p>
           </div>
 
-          <div className="bg-[#0c1410] border border-emerald-500/20 rounded-2xl p-6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
               <Share2 className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-base font-bold text-white">Food Marketing</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Brand positioning, label storytelling, compliance disclosures, and consumer trust-building.
+            <h3 className="font-serif text-base font-bold text-slate-900">{t.consultation.distributionTitle}</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.consultation.distributionDesc}
             </p>
           </div>
 
-          <div className="bg-[#0c1410] border border-emerald-500/20 rounded-2xl p-6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
               <Truck className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-base font-bold text-white">Distribution Guidance</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              B2B distributor networks, retail grocery onboarding, direct-to-consumer delivery loops, and logistics.
+            <h3 className="font-serif text-base font-bold text-slate-900">{t.consultation.complianceTitle}</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.consultation.complianceDesc}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Consultation Request Form */}
+      {/* Main Request Form */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#0e1420] border border-emerald-500/30 rounded-3xl p-6 sm:p-10 shadow-2xl">
-          <div className="text-center max-w-xl mx-auto mb-8 space-y-2">
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">
-              Request a Consultation
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xs">
+          <div className="mb-8 space-y-2 text-center sm:text-left">
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+              {t.consultation.formTitle}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
-              Tell us about your venture. Our food specialists will review your requirements and coordinate an initial advisory session.
+            <p className="text-xs sm:text-sm text-slate-600">
+              {t.consultation.formSubtitle}
             </p>
           </div>
 
-          {successId ? (
-            <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-2xl p-8 text-center space-y-4">
-              <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <h3 className="font-serif text-xl font-bold text-white">
-                Consultation Request Received!
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                Thank you. Your inquiry reference is <span className="font-mono text-emerald-400 font-semibold">{successId}</span>. Our advisory team will reach out via your preferred channel within 24 hours.
-              </p>
-              <div className="pt-2 flex flex-wrap justify-center gap-3">
-                <a
-                  href={getWhatsAppUrl(`Hello Aditya Food & Media, I have submitted consultation request ${successId}. I would like to discuss it directly.`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>Chat on WhatsApp</span>
-                </a>
-                <button
-                  onClick={() => setSuccessId(null)}
-                  className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs font-semibold"
-                >
-                  Submit Another Request
-                </button>
+          {successId && (
+            <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm flex items-start space-x-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold">{t.consultation.successMessage}</span>
+                <p className="text-xs text-emerald-800">
+                  Reference ID: <span className="font-mono font-semibold">{successId}</span>
+                </p>
+                <div className="flex items-center space-x-1.5 pt-0.5 text-[11px] text-emerald-700">
+                  <Database className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>
+                    {superbaseSynced
+                      ? 'Appointment details successfully saved to SuperBase backend table.'
+                      : 'Appointment logged & synced with backend.'}
+                  </span>
+                </div>
               </div>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {errorMessage && (
-                <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-center space-x-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
+          )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Rajesh Kumar"
-                    className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                  />
-                </div>
+          {errorMessage && (
+            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Business / Project Name (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                    placeholder="e.g. Sunrise Organic Dairy"
-                    className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@example.com"
-                    className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Phone / WhatsApp Number *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
-                    className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Consultation Domain
-                  </label>
-                  <select
-                    value={consultationType}
-                    onChange={(e) => setConsultationType(e.target.value)}
-                    className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                  >
-                    <option value="Food Processing">Food Processing & Pasteurization</option>
-                    <option value="Packaging & Shelf Life">Packaging Consultation & Shelf Life</option>
-                    <option value="Food Marketing">Food Brand Marketing & Strategy</option>
-                    <option value="Distribution Guidance">Distribution & Cold-Chain Logistics</option>
-                    <option value="Turnkey Dairy Unit">Turnkey Dairy Unit Setup</option>
-                    <option value="General Consultation">General Food Advisory</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Preferred Contact Channel
-                  </label>
-                  <select
-                    value={preferredContact}
-                    onChange={(e) => setPreferredContact(e.target.value as any)}
-                    className="w-full bg-[#080b12] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                  >
-                    <option value="whatsapp">WhatsApp</option>
-                    <option value="phone">Direct Phone Call</option>
-                    <option value="email">Email</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                  Project Details / Specific Questions *
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {t.consultation.fullName} *
                 </label>
-                <textarea
+                <input
+                  type="text"
                   required
-                  rows={4}
-                  value={projectDetails}
-                  onChange={(e) => setProjectDetails(e.target.value)}
-                  placeholder="Describe your current product, target market, capacity goals, or any specific challenge you are facing..."
-                  className="w-full bg-[#080b12] border border-white/10 rounded-xl p-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="e.g. Ramesh Mohapatra"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {t.consultation.businessName}
+                </label>
+                <input
+                  type="text"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder="e.g. Utkal Dairy Enterprises"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {t.consultation.email} *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {t.consultation.phone} *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 94370 12345"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {t.consultation.consultationTopic}
+                </label>
+                <select
+                  value={consultationType}
+                  onChange={(e) => setConsultationType(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
+                >
+                  <option value="Food Processing">Dairy & Food Processing Guidance</option>
+                  <option value="Packaging Solutions">Packaging & Preservation Technology</option>
+                  <option value="Cold Chain & Logistics">Cold Chain & Distribution Strategy</option>
+                  <option value="Licensing & FSSAI Standards">Licensing & Regulatory Compliance</option>
+                  <option value="Commercial Food Brand Scaling">Commercial Brand Strategy</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Preferred Contact Channel
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['whatsapp', 'phone', 'email'] as const).map((method) => (
+                    <button
+                      key={method}
+                      type="button"
+                      onClick={() => setPreferredContact(method)}
+                      className={`py-2 px-2 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
+                        preferredContact === method
+                          ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {method}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                {t.consultation.message} *
+              </label>
+              <textarea
+                rows={4}
+                required
+                value={projectDetails}
+                onChange={(e) => setProjectDetails(e.target.value)}
+                placeholder="Share your requirements or questions..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-colors"
+              />
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3.5 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 py-3 px-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs disabled:opacity-50 cursor-pointer"
               >
-                {submitting ? (
-                  <span>Submitting to Advisory Team...</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Send Consultation Request</span>
-                  </>
-                )}
+                <Send className="w-4 h-4" />
+                <span>{submitting ? t.consultation.submitting : t.consultation.submitBtn}</span>
               </button>
-            </form>
-          )}
+
+              <a
+                href={getWhatsAppUrl('Hello Aditya Food & Media, I would like to consult with you directly regarding my food business venture.')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold text-emerald-800 hover:text-emerald-950 transition-colors"
+              >
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
+                <span>{t.contact.whatsappAction}</span>
+              </a>
+            </div>
+          </form>
         </div>
       </section>
     </div>

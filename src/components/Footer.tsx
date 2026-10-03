@@ -15,10 +15,11 @@ import {
   ShieldCheck,
   Milk,
   Film,
+  Languages,
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { settings, navigate, getWhatsAppUrl, openAdminPortal } = useSite();
+  const { settings, navigate, getWhatsAppUrl, openAdminPortal, t, language, setLanguage } = useSite();
   const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
@@ -26,59 +27,60 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-[#06090e] border-t border-white/10 text-slate-300 pt-16 pb-10 relative overflow-hidden">
-      {/* Subtle background ambient accents */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-900/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-white/10">
-          {/* Brand Col */}
-          <div className="lg:col-span-2 space-y-5">
+    <footer className="bg-slate-100/90 border-t border-slate-200 text-slate-600 pt-16 pb-12 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-200">
+          {/* Brand Column */}
+          <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center space-x-3.5">
-              <div className="w-14 h-14 shrink-0">
+              <div className="w-13 h-13 shrink-0">
                 <AdityaMainLogo className="w-full h-full" />
               </div>
               <div>
-                <span className="font-serif text-xl font-bold tracking-wider text-white">
-                  ADITYA <span className="text-amber-400 font-sans font-light text-sm">FOOD & MEDIA</span>
+                <span className="font-serif text-xl font-bold tracking-tight text-slate-900">
+                  {t.nav.brandTitle}{' '}
+                  <span className="text-amber-600 font-sans font-medium text-sm">
+                    {t.nav.brandSubtitle}
+                  </span>
                 </span>
-                <p className="text-xs text-amber-200/70 uppercase tracking-widest">
-                  Where Quality Meets Creativity
+                <p className="text-xs text-amber-800/80 font-medium uppercase tracking-wider">
+                  {t.nav.tagline}
                 </p>
               </div>
             </div>
 
-            <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-              Harmonizing the pure essence of dairy nutrition and artisanal food consultation with high-impact broadcast media, cinema, and music production.
+            <p className="text-sm text-slate-600 leading-relaxed max-w-sm">
+              {t.footer.aboutText}
             </p>
 
-            {/* Official Division Badges */}
-            <div className="flex items-center space-x-4 pt-2">
-              <div
+            {/* Division Switchers */}
+            <div className="flex items-center space-x-3 pt-1">
+              <button
+                type="button"
                 onClick={() => navigate('/foods')}
-                className="cursor-pointer group flex items-center space-x-2 bg-white/5 hover:bg-white/10 p-2 rounded-xl border border-white/5 transition-all"
+                className="cursor-pointer group flex items-center space-x-2 bg-white hover:bg-emerald-50/60 p-2 rounded-xl border border-slate-200/90 transition-all shadow-xs"
               >
-                <AdityaFoodsBadge className="w-16 h-auto group-hover:scale-105 transition-transform" />
-                <span className="text-[11px] font-semibold text-emerald-400">Foods</span>
-              </div>
-              <div
+                <AdityaFoodsBadge className="w-14 h-auto group-hover:scale-105 transition-transform" />
+                <span className="text-xs font-semibold text-emerald-800">{t.nav.foods}</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => navigate('/media')}
-                className="cursor-pointer group flex items-center space-x-2 bg-white/5 hover:bg-white/10 p-2 rounded-xl border border-white/5 transition-all"
+                className="cursor-pointer group flex items-center space-x-2 bg-white hover:bg-amber-50/60 p-2 rounded-xl border border-slate-200/90 transition-all shadow-xs"
               >
-                <AdityaMediaBadge className="w-16 h-auto group-hover:scale-105 transition-transform" />
-                <span className="text-[11px] font-semibold text-amber-400">Media</span>
-              </div>
+                <AdityaMediaBadge className="w-14 h-auto group-hover:scale-105 transition-transform" />
+                <span className="text-xs font-semibold text-amber-800">{t.nav.media}</span>
+              </button>
             </div>
 
             {/* Social Icons */}
-            <div className="flex items-center space-x-3 pt-2">
+            <div className="flex items-center space-x-2.5 pt-2">
               {settings.youtube && (
                 <a
                   href={settings.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-white/5 hover:bg-red-600/20 text-slate-400 hover:text-red-400 flex items-center justify-center transition-colors border border-white/5 hover:border-red-500/30"
+                  className="w-9 h-9 rounded-xl bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 flex items-center justify-center transition-colors border border-slate-200 shadow-xs"
                   aria-label="YouTube Channel"
                 >
                   <Youtube className="w-4 h-4" />
@@ -89,7 +91,7 @@ export const Footer: React.FC = () => {
                   href={settings.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-white/5 hover:bg-pink-600/20 text-slate-400 hover:text-pink-400 flex items-center justify-center transition-colors border border-white/5 hover:border-pink-500/30"
+                  className="w-9 h-9 rounded-xl bg-white hover:bg-pink-50 text-slate-600 hover:text-pink-600 flex items-center justify-center transition-colors border border-slate-200 shadow-xs"
                   aria-label="Instagram Profile"
                 >
                   <Instagram className="w-4 h-4" />
@@ -100,7 +102,7 @@ export const Footer: React.FC = () => {
                   href={settings.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-white/5 hover:bg-blue-600/20 text-slate-400 hover:text-blue-400 flex items-center justify-center transition-colors border border-white/5 hover:border-blue-500/30"
+                  className="w-9 h-9 rounded-xl bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-600 flex items-center justify-center transition-colors border border-slate-200 shadow-xs"
                   aria-label="Facebook Page"
                 >
                   <Facebook className="w-4 h-4" />
@@ -111,7 +113,7 @@ export const Footer: React.FC = () => {
                   href={settings.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-white/5 hover:bg-sky-600/20 text-slate-400 hover:text-sky-400 flex items-center justify-center transition-colors border border-white/5 hover:border-sky-500/30"
+                  className="w-9 h-9 rounded-xl bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-colors border border-slate-200 shadow-xs"
                   aria-label="LinkedIn Profile"
                 >
                   <Linkedin className="w-4 h-4" />
@@ -122,7 +124,7 @@ export const Footer: React.FC = () => {
                   href={settings.xTwitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-white/5 hover:bg-slate-200/20 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-white/5 hover:border-white/30"
+                  className="w-9 h-9 rounded-xl bg-white hover:bg-slate-200/50 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors border border-slate-200 shadow-xs"
                   aria-label="X Twitter Account"
                 >
                   <Twitter className="w-4 h-4" />
@@ -133,34 +135,45 @@ export const Footer: React.FC = () => {
 
           {/* Quick Links: Foods */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center space-x-1.5">
-              <Milk className="w-4 h-4" />
-              <span>Aditya Foods</span>
+            <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center space-x-1.5">
+              <Milk className="w-4 h-4 text-emerald-600" />
+              <span>{t.footer.foodsDivision}</span>
             </h4>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <ul className="space-y-2 text-sm text-slate-600">
               <li>
-                <button onClick={() => navigate('/foods')} className="hover:text-emerald-300 transition-colors">
-                  Foods Philosophy
+                <button
+                  type="button"
+                  onClick={() => navigate('/foods')}
+                  className="hover:text-emerald-800 transition-colors cursor-pointer"
+                >
+                  {t.nav.foodsOverview}
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/foods/products')} className="hover:text-emerald-300 transition-colors">
-                  Fresh Farm Milk
+                <button
+                  type="button"
+                  onClick={() => navigate('/foods/products')}
+                  className="hover:text-emerald-800 transition-colors cursor-pointer"
+                >
+                  {t.nav.dairyProducts}
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/foods/products')} className="hover:text-emerald-300 transition-colors">
-                  Pure Golden Ghee
+                <button
+                  type="button"
+                  onClick={() => navigate('/foods/consultation')}
+                  className="hover:text-emerald-800 transition-colors cursor-pointer"
+                >
+                  {t.nav.foodConsultation}
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/foods/products')} className="hover:text-emerald-300 transition-colors">
-                  Paneer &amp; Table Butter
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/foods/consultation')} className="hover:text-emerald-300 transition-colors">
-                  Food Business Consultation
+                <button
+                  type="button"
+                  onClick={() => navigate('/about')}
+                  className="hover:text-emerald-800 transition-colors cursor-pointer"
+                >
+                  {t.about.heritageTitle}
                 </button>
               </li>
             </ul>
@@ -168,34 +181,45 @@ export const Footer: React.FC = () => {
 
           {/* Quick Links: Media */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
-              <Film className="w-4 h-4" />
-              <span>Aditya Media</span>
+            <h4 className="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center space-x-1.5">
+              <Film className="w-4 h-4 text-amber-600" />
+              <span>{t.footer.mediaDivision}</span>
             </h4>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <ul className="space-y-2 text-sm text-slate-600">
               <li>
-                <button onClick={() => navigate('/media')} className="hover:text-amber-300 transition-colors">
-                  Media Division Overview
+                <button
+                  type="button"
+                  onClick={() => navigate('/media')}
+                  className="hover:text-amber-800 transition-colors cursor-pointer"
+                >
+                  {t.nav.mediaOverview}
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/media/videos')} className="hover:text-amber-300 transition-colors">
-                  YouTube Video Gallery
+                <button
+                  type="button"
+                  onClick={() => navigate('/media/videos')}
+                  className="hover:text-amber-800 transition-colors cursor-pointer"
+                >
+                  {t.nav.videoGallery}
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/media/portfolio')} className="hover:text-amber-300 transition-colors">
-                  Broadcast &amp; Film Portfolio
+                <button
+                  type="button"
+                  onClick={() => navigate('/media/portfolio')}
+                  className="hover:text-amber-800 transition-colors cursor-pointer"
+                >
+                  {t.nav.mediaPortfolio}
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate('/media')} className="hover:text-amber-300 transition-colors">
-                  Music &amp; Sound Production
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate('/contact')} className="hover:text-amber-300 transition-colors">
-                  Media Collaborations
+                <button
+                  type="button"
+                  onClick={() => navigate('/contact')}
+                  className="hover:text-amber-800 transition-colors cursor-pointer"
+                >
+                  {t.media.collaborateCtaTitle}
                 </button>
               </li>
             </ul>
@@ -203,25 +227,25 @@ export const Footer: React.FC = () => {
 
           {/* Official Contact Info */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
-              Get In Touch
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              {t.footer.contactHeading}
             </h4>
-            <ul className="space-y-2.5 text-sm text-slate-400">
+            <ul className="space-y-2.5 text-sm text-slate-600">
               <li className="flex items-start space-x-2.5">
-                <Phone className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <a href={`tel:${settings.phone || '0674-2915041'}`} className="hover:text-white transition-colors">
+                <Phone className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <a href={`tel:${settings.phone || '0674-2915041'}`} className="hover:text-slate-900 transition-colors">
                   {settings.phone || '0674-2915041'}
                 </a>
               </li>
               <li className="flex items-start space-x-2.5">
-                <Mail className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <a href={`mailto:${settings.email || 'personal@adityafoodsandmedia.com'}`} className="hover:text-white transition-colors break-all">
+                <Mail className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <a href={`mailto:${settings.email || 'personal@adityafoodsandmedia.com'}`} className="hover:text-slate-900 transition-colors break-all">
                   {settings.email || 'personal@adityafoodsandmedia.com'}
                 </a>
               </li>
               <li className="flex items-start space-x-2.5">
-                <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span className="text-xs leading-relaxed">
+                <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-xs leading-relaxed text-slate-600">
                   {settings.address || 'Bhubaneswar, Odisha, India'}
                 </span>
               </li>
@@ -230,38 +254,71 @@ export const Footer: React.FC = () => {
                   href={getWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 text-xs font-medium hover:bg-emerald-600 hover:text-white transition-colors"
+                  className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition-colors shadow-xs"
                 >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>Chat on WhatsApp</span>
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{t.contact.whatsappAction}</span>
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-slate-400 space-y-4 md:space-y-0">
-          <div>
-            &copy; {currentYear} Aditya Food &amp; Media. All rights reserved.
+        {/* Bottom bar with Language Switcher, Legal, Admin, and Back to Top */}
+        <div className="pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+          <div className="flex items-center space-x-3">
+            <span>&copy; {currentYear} Aditya Food &amp; Media. {t.footer.rightsReserved}</span>
+            <span className="hidden sm:inline text-slate-300">|</span>
+            {/* Inline Footer Language Switcher */}
+            <div className="inline-flex items-center space-x-1 bg-white px-2 py-1 rounded-lg border border-slate-200">
+              <Languages className="w-3 h-3 text-slate-400" />
+              <button
+                type="button"
+                onClick={() => setLanguage('or')}
+                className={`font-semibold ${language === 'or' ? 'text-amber-700 font-bold' : 'text-slate-500 hover:text-slate-800'}`}
+              >
+                ଓଡ଼ିଆ
+              </button>
+              <span className="text-slate-300">/</span>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`font-semibold ${language === 'en' ? 'text-amber-700 font-bold' : 'text-slate-500 hover:text-slate-800'}`}
+              >
+                English
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-6">
-            <button onClick={() => navigate('/privacy-policy')} className="hover:text-slate-200 transition-colors">
-              Privacy Policy
-            </button>
-            <button onClick={() => navigate('/terms')} className="hover:text-slate-200 transition-colors">
-              Terms &amp; Conditions
-            </button>
-            <button onClick={openAdminPortal} className="hover:text-amber-400 transition-colors flex items-center space-x-1 cursor-pointer">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Admin Portal</span>
+          <div className="flex items-center space-x-5">
+            <button
+              type="button"
+              onClick={() => navigate('/privacy-policy')}
+              className="hover:text-slate-800 transition-colors cursor-pointer"
+            >
+              {t.footer.privacyPolicy}
             </button>
             <button
+              type="button"
+              onClick={() => navigate('/terms')}
+              className="hover:text-slate-800 transition-colors cursor-pointer"
+            >
+              {t.footer.termsConditions}
+            </button>
+            <button
+              type="button"
+              onClick={openAdminPortal}
+              className="hover:text-amber-700 transition-colors flex items-center space-x-1 cursor-pointer font-medium"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+              <span>{t.footer.adminPortal}</span>
+            </button>
+            <button
+              type="button"
               onClick={scrollToTop}
-              className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-              title="Back to top"
-              aria-label="Back to top"
+              className="p-2 rounded-xl bg-white hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors shadow-xs"
+              title={t.footer.backToTop}
+              aria-label={t.footer.backToTop}
             >
               <ArrowUp className="w-4 h-4" />
             </button>

@@ -14,12 +14,12 @@ import {
   CheckCircle2,
   Tv,
   Music,
-  Video,
   Users,
+  MessageCircle,
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
-  const { products, videos, navigate, getWhatsAppUrl } = useSite();
+  const { products, videos, navigate, getWhatsAppUrl, t, language } = useSite();
   const [heroMode, setHeroMode] = useState<'both' | 'foods' | 'media'>('both');
 
   const featuredProducts = products.filter((p) => p.featured).slice(0, 4);
@@ -29,135 +29,141 @@ export const HomePage: React.FC = () => {
   const displayVideos = featuredVideos.length > 0 ? featuredVideos : videos.slice(0, 3);
 
   return (
-    <div className="space-y-24">
-      {/* 1. CINEMATIC HERO SECTION */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden pt-24 pb-16">
-        {/* Background Visual Elements */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#090d16] via-[#070a10] to-[#0b0f17]" />
-          {/* Subtle dual ambient light */}
-          <div className="absolute top-1/4 left-10 w-96 h-96 bg-red-700/15 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute top-1/3 right-10 w-96 h-96 bg-amber-500/15 rounded-full blur-[140px] pointer-events-none" />
-        </div>
+    <div className="space-y-20 pb-16">
+      {/* 1. LIGHT MODERN HERO SECTION */}
+      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-28 pb-16 bg-gradient-to-b from-amber-50/40 via-white to-[#fafaf9]">
+        {/* Soft, warm ambient light spots */}
+        <div className="absolute top-12 left-1/4 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-20 right-1/4 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          {/* Center Brand Statement with Official Emblem */}
-          <div className="text-center max-w-3xl mx-auto space-y-6">
-            <div className="flex justify-center mb-2">
-              <div className="relative group cursor-pointer" onClick={() => navigate('/about')}>
-                <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl scale-125 animate-pulse" />
-                <div className="w-24 h-24 sm:w-28 sm:h-28 relative z-10 transform group-hover:scale-105 transition-transform duration-300">
+          {/* Center Brand Statement */}
+          <div className="text-center max-w-3xl mx-auto space-y-5">
+            <div className="flex justify-center mb-1">
+              <div
+                className="relative group cursor-pointer"
+                onClick={() => navigate('/about')}
+                title={t.nav.about}
+              >
+                <div className="w-20 h-20 sm:w-24 sm:h-24 relative z-10 transform group-hover:scale-105 transition-transform duration-300 drop-shadow-sm">
                   <AdityaMainLogo className="w-full h-full" />
                 </div>
               </div>
             </div>
 
-            <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs font-medium uppercase tracking-widest text-amber-200">
-                Two Passions, One Vision
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white border border-amber-200 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <span className="text-xs font-semibold text-amber-900 tracking-wide">
+                {t.home.heroKicker}
               </span>
             </div>
 
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
-              Aditya <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 bg-clip-text text-transparent">Food &amp; Media</span>
+            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
+              {t.home.heroTitle}
             </h1>
 
-            <p className="font-serif text-xl sm:text-2xl text-amber-100/90 font-light tracking-wide">
-              Freshness in Every Bite. Creativity in Every Frame.
+            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal">
+              {t.home.heroSubtitle}
             </p>
 
-            <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed font-light">
-              Discover our world of quality dairy products, food consultation, media production and entertainment. Committed to uncompromising quality and visionary creativity.
-            </p>
-
-            {/* Quick Filter Pill for Hero Focus */}
-            <div className="flex items-center justify-center gap-2 pt-2">
+            {/* Quick Filter for Focus */}
+            <div className="flex items-center justify-center gap-2 pt-1">
               <button
+                type="button"
                 onClick={() => setHeroMode('both')}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  heroMode === 'both' ? 'bg-amber-400 text-slate-950 font-semibold' : 'bg-white/5 text-slate-400 hover:text-white'
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  heroMode === 'both'
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
                 }`}
               >
-                Unified Overview
+                {language === 'or' ? 'ଉଭୟ ବିଭାଗ (All)' : 'All Divisions'}
               </button>
               <button
+                type="button"
                 onClick={() => setHeroMode('foods')}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  heroMode === 'foods' ? 'bg-red-600 text-white font-semibold' : 'bg-white/5 text-slate-400 hover:text-white'
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  heroMode === 'foods'
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : 'bg-white text-emerald-800 hover:bg-emerald-50 border border-emerald-200'
                 }`}
               >
-                Aditya Foods Focus
+                {t.nav.foods}
               </button>
               <button
+                type="button"
                 onClick={() => setHeroMode('media')}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  heroMode === 'media' ? 'bg-red-600 text-white font-semibold' : 'bg-white/5 text-slate-400 hover:text-white'
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  heroMode === 'media'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'bg-white text-amber-800 hover:bg-amber-50 border border-amber-200'
                 }`}
               >
-                Aditya Media Focus
+                {t.nav.media}
               </button>
             </div>
           </div>
 
-          {/* DUAL ESSENCE SPLIT CARDS WITH OFFICIAL DIVISION BADGES */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-14">
+          {/* DUAL ESSENCE LIGHT PANELS */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
             {/* ADITYA FOODS PANEL */}
             {(heroMode === 'both' || heroMode === 'foods') && (
-              <div className="group relative rounded-3xl overflow-hidden border border-red-500/20 bg-gradient-to-br from-[#160c0e] via-[#0f1712] to-[#07100b] p-8 sm:p-10 shadow-2xl transition-all duration-300 hover:border-red-500/50">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="group relative rounded-3xl overflow-hidden border border-emerald-200/90 bg-white p-7 sm:p-9 shadow-xs hover:shadow-md transition-all duration-200">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50 rounded-full blur-2xl pointer-events-none" />
 
-                <div className="relative z-10 space-y-5">
+                <div className="relative z-10 space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <AdityaFoodsBadge className="w-24 sm:w-28 h-auto" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-500/30">
-                        Dairy Division
+                    <div className="flex items-center space-x-2.5">
+                      <AdityaFoodsBadge className="w-20 sm:w-24 h-auto" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                        {t.foods.badge}
                       </span>
                     </div>
-                    <span className="text-xs text-amber-200/60 font-mono hidden sm:inline">Odisha &bull; India</span>
+                    <span className="text-xs text-slate-500 hidden sm:inline">Odisha &bull; India</span>
                   </div>
 
-                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white group-hover:text-emerald-300 transition-colors">
-                    Pure Quality. Authentic Taste.
-                  </h3>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">
+                    {t.foods.heroTitle}
+                  </h2>
 
-                  <p className="text-sm text-slate-300 leading-relaxed font-light">
-                    Farm-fresh milk, bilona churned pure ghee, creamy table butter, and fresh malai paneer crafted with uncompromising hygiene, temperature fidelity, and ethical farm partnerships.
+                  <p className="text-sm text-slate-600 leading-relaxed font-normal">
+                    {t.home.foodsIntroDesc}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2 text-xs text-slate-300">
+                  <div className="grid grid-cols-2 gap-2.5 pt-1 text-xs text-slate-700">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Farm-Direct Milk</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>{t.home.pillarsTitle ? '100% Farm Fresh' : 'Fresh Milk'}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Granular Golden Ghee</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Pure Golden Ghee</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Melt-in-Mouth Paneer</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Fresh Malai Paneer</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Agribusiness Consultation</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>{t.nav.foodConsultation}</span>
                     </div>
                   </div>
 
-                  <div className="pt-4 flex flex-wrap items-center gap-3">
+                  <div className="pt-3 flex flex-wrap items-center gap-3">
                     <button
+                      type="button"
                       onClick={() => navigate('/foods/products')}
-                      className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs tracking-wider uppercase transition-all shadow-lg shadow-emerald-500/20"
+                      className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs tracking-wide transition-all shadow-xs cursor-pointer"
                     >
-                      <span>Explore Products</span>
+                      <span>{t.home.exploreFoodsBtn}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => navigate('/foods/consultation')}
-                      className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/20 text-xs font-medium transition-colors"
+                      className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-emerald-900 border border-slate-200 text-xs font-semibold transition-colors cursor-pointer"
                     >
-                      <span>Food Consultation</span>
+                      <span>{t.nav.foodConsultation}</span>
                     </button>
                   </div>
                 </div>
@@ -166,90 +172,121 @@ export const HomePage: React.FC = () => {
 
             {/* ADITYA MEDIA PANEL */}
             {(heroMode === 'both' || heroMode === 'media') && (
-              <div className="group relative rounded-3xl overflow-hidden border border-amber-500/20 bg-gradient-to-br from-[#1a0e10] via-[#12111c] to-[#0a0a14] p-8 sm:p-10 shadow-2xl transition-all duration-300 hover:border-amber-500/50">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="group relative rounded-3xl overflow-hidden border border-amber-200/90 bg-white p-7 sm:p-9 shadow-xs hover:shadow-md transition-all duration-200">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-amber-50 rounded-full blur-2xl pointer-events-none" />
 
-                <div className="relative z-10 space-y-5">
+                <div className="relative z-10 space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <AdityaMediaBadge className="w-24 sm:w-28 h-auto" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-950/60 px-3 py-1 rounded-full border border-amber-500/30">
-                        Media Division
+                    <div className="flex items-center space-x-2.5">
+                      <AdityaMediaBadge className="w-20 sm:w-24 h-auto" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                        {t.media.badge}
                       </span>
                     </div>
-                    <span className="text-xs text-amber-200/60 font-mono hidden sm:inline">Cinema &amp; Broadcast</span>
+                    <span className="text-xs text-slate-500 hidden sm:inline">Cinema &amp; Broadcast</span>
                   </div>
 
-                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white group-hover:text-amber-300 transition-colors">
-                    Stories That Inspire. Media That Connects.
-                  </h3>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 group-hover:text-amber-800 transition-colors">
+                    {t.media.heroTitle}
+                  </h2>
 
-                  <p className="text-sm text-slate-300 leading-relaxed font-light">
-                    Transforming compelling narratives into broadcast television, feature cinematography, original music recordings, high-definition documentaries, and full-stack creative campaigns.
+                  <p className="text-sm text-slate-600 leading-relaxed font-normal">
+                    {t.home.mediaIntroDesc}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2 text-xs text-slate-300">
+                  <div className="grid grid-cols-2 gap-2.5 pt-1 text-xs text-slate-700">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Broadcast Television</span>
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>{t.media.broadcastingTitle}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>4K Cinema Production</span>
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>{t.media.cinematographyTitle}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Audio Recording &amp; Music</span>
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>{t.media.musicStudioTitle}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Live Event Broadcasting</span>
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>{t.media.brandCampaignsTitle}</span>
                     </div>
                   </div>
 
-                  <div className="pt-4 flex flex-wrap items-center gap-3">
+                  <div className="pt-3 flex flex-wrap items-center gap-3">
                     <button
+                      type="button"
                       onClick={() => navigate('/media/videos')}
-                      className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-semibold text-xs tracking-wider uppercase transition-all shadow-lg shadow-amber-500/20"
+                      className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs tracking-wide transition-all shadow-xs cursor-pointer"
                     >
-                      <span>Watch Video Gallery</span>
+                      <span>{t.home.exploreMediaBtn}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => navigate('/media/portfolio')}
-                      className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-500/20 text-xs font-medium transition-colors"
+                      className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-amber-900 border border-slate-200 text-xs font-semibold transition-colors cursor-pointer"
                     >
-                      <span>View Portfolio</span>
+                      <span>{t.nav.mediaPortfolio}</span>
                     </button>
                   </div>
                 </div>
               </div>
             )}
           </div>
+
+          {/* KEY STATS ROW */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-xs">
+              <div className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                {t.home.stats.pureQualityLabel}
+              </div>
+              <div className="text-xs text-slate-600 mt-1">{t.home.stats.pureQualityDesc}</div>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-xs">
+              <div className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                {t.home.stats.viewsLabel}
+              </div>
+              <div className="text-xs text-slate-600 mt-1">{t.home.stats.viewsDesc}</div>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-xs">
+              <div className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                {t.home.stats.experienceLabel}
+              </div>
+              <div className="text-xs text-slate-600 mt-1">{t.home.stats.experienceDesc}</div>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-xs">
+              <div className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                {t.home.stats.householdsLabel}
+              </div>
+              <div className="text-xs text-slate-600 mt-1">{t.home.stats.householdsDesc}</div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* 2. ADITYA FOODS: PRODUCT SHOWCASE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-white/10 gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-5 border-b border-slate-200 gap-4">
           <div>
-            <div className="flex items-center space-x-3 text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-2">
-              <AdityaFoodsBadge className="w-16 h-auto" />
-              <span>Dairy Excellence &amp; Wholesome Purity</span>
+            <div className="flex items-center space-x-2 text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1.5">
+              <AdityaFoodsBadge className="w-14 h-auto" />
+              <span>{t.home.foodsIntroKicker}</span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
-              Aditya Foods Product Showcase
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+              {t.foods.productsHeading}
             </h2>
-            <p className="text-sm text-slate-400 mt-2 max-w-xl">
-              From our farms to your family table: fresh milk, golden ghee, table butter, malai paneer, and probiotic curd crafted with uncompromising care.
+            <p className="text-sm text-slate-600 mt-1 max-w-xl">
+              {t.foods.productsSubtitle}
             </p>
           </div>
 
           <button
+            type="button"
             onClick={() => navigate('/foods/products')}
-            className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors"
+            className="inline-flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 transition-colors cursor-pointer"
           >
-            <span>View All Products</span>
+            <span>{t.home.viewAllProducts}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -262,66 +299,63 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 3. OUR COMMITMENT TO QUALITY (4 PILLARS) */}
-      <section className="bg-[#080d16] border-y border-white/10 py-20 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-semibold text-emerald-400 uppercase tracking-widest">
-              Standard of Integrity
+      <section className="bg-white border-y border-slate-200 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
+            <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              {t.home.pillarsTitle}
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
-              Our Commitment to Quality
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+              {t.home.pillarsSubtitle}
             </h2>
-            <p className="text-sm text-slate-400">
-              Upholding strict hygiene, consistent sourcing, and continuous testing to ensure every product delivers genuine nourishment.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-[#0e1422] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-emerald-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-emerald-300 transition-colors">
+              <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="font-serif text-lg font-bold text-white">
-                Quality-Focused Production
+              <h3 className="font-serif text-base font-bold text-slate-900">
+                {t.home.purityPillar}
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Stringent temperature management from collection points through processing, safeguarding natural enzymes and nutrients.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {t.home.purityPillarDesc}
               </p>
             </div>
 
-            <div className="bg-[#0e1422] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-emerald-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-emerald-300 transition-colors">
+              <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-serif text-lg font-bold text-white">
-                Freshness and Care
+              <h3 className="font-serif text-base font-bold text-slate-900">
+                {t.home.coldChainPillar}
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Rapid turnaround times from milking to packaging guarantee that fresh flavor and authentic texture reach consumers every day.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {t.home.coldChainPillarDesc}
               </p>
             </div>
 
-            <div className="bg-[#0e1422] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-emerald-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-amber-300 transition-colors">
+              <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="font-serif text-lg font-bold text-white">
-                Hygiene and Safety
+              <h3 className="font-serif text-base font-bold text-slate-900">
+                {t.home.creativityPillar}
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Stainless-steel sanitary pipelines, food-grade packaging barrier technology, and regular swab microbiological audits.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {t.home.creativityPillarDesc}
               </p>
             </div>
 
-            <div className="bg-[#0e1422] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-emerald-500/40 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-emerald-300 transition-colors">
+              <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
                 <HeartHandshake className="w-6 h-6" />
               </div>
-              <h3 className="font-serif text-lg font-bold text-white">
-                Customer Satisfaction
+              <h3 className="font-serif text-base font-bold text-slate-900">
+                {t.home.communityPillar}
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Dedicated customer feedback loops, transparent communication, and adaptable packaging tailored for household and institutional needs.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {t.home.communityPillarDesc}
               </p>
             </div>
           </div>
@@ -330,25 +364,26 @@ export const HomePage: React.FC = () => {
 
       {/* 4. ADITYA MEDIA: INTERACTIVE YOUTUBE VIDEO GALLERY */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-white/10 gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-5 border-b border-slate-200 gap-4">
           <div>
-            <div className="flex items-center space-x-3 text-xs font-semibold text-amber-400 uppercase tracking-widest mb-2">
-              <AdityaMediaBadge className="w-16 h-auto" />
-              <span>Aditya Media Studio</span>
+            <div className="flex items-center space-x-2 text-xs font-bold text-amber-800 uppercase tracking-wider mb-1.5">
+              <AdityaMediaBadge className="w-14 h-auto" />
+              <span>{t.home.mediaIntroKicker}</span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
-              Interactive Video Gallery
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+              {t.nav.videoGallery}
             </h2>
-            <p className="text-sm text-slate-400 mt-2 max-w-xl">
-              Hover over any video on desktop for an instant muted preview, or click to watch in our dedicated high-definition cinema player.
+            <p className="text-sm text-slate-600 mt-1 max-w-xl">
+              {t.media.latestReelsSubtitle}
             </p>
           </div>
 
           <button
+            type="button"
             onClick={() => navigate('/media/videos')}
-            className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-400 hover:text-amber-300 transition-colors"
+            className="inline-flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 hover:text-amber-950 transition-colors cursor-pointer"
           >
-            <span>Explore All Videos</span>
+            <span>{t.home.viewAllVideos}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -362,32 +397,38 @@ export const HomePage: React.FC = () => {
 
       {/* 5. FOOD CONSULTATION PROMO BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-[#0d1a14] via-[#091510] to-[#0c121e] p-8 sm:p-12 relative overflow-hidden">
-          <div className="relative z-10 max-w-2xl space-y-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-              Food Entrepreneurship &amp; Advisory
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50/70 p-8 sm:p-10 shadow-xs relative overflow-hidden">
+          <div className="relative z-10 max-w-2xl space-y-3.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+              {t.consultation.badge}
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight">
-              Have a Food Business Idea? Let’s Talk.
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
+              {t.consultation.heroTitle}
             </h2>
-            <p className="text-sm text-slate-300 leading-relaxed font-light">
-              Benefit from our industry expertise across dairy processing guidance, food safety compliance, sustainable packaging selection, and regional distribution roadmap strategy.
+            <p className="text-sm text-slate-700 leading-relaxed">
+              {t.consultation.heroSubtitle}
             </p>
 
-            <div className="pt-4 flex flex-wrap gap-4">
+            <div className="pt-2 flex flex-wrap gap-3">
               <button
+                type="button"
                 onClick={() => navigate('/foods/consultation')}
-                className="px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors shadow-lg shadow-emerald-500/20"
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs tracking-wide transition-colors shadow-xs cursor-pointer"
               >
-                Request Food Consultation
+                {t.foods.consultationCtaBtn}
               </button>
               <a
-                href={getWhatsAppUrl('Hello Aditya Food & Media, I would like to consult with you regarding a food business project.')}
+                href={getWhatsAppUrl(
+                  language === 'or'
+                    ? 'ନମସ୍କାର, ମୁଁ ଖାଦ୍ୟ ବ୍ୟବସାୟ ପରାମର୍ଶ ବିଷୟରେ ଆଲୋଚନା କରିବାକୁ ଚାହେଁ।'
+                    : 'Hello Aditya Food & Media, I would like to consult regarding food business services.'
+                )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 text-white font-medium text-xs border border-white/10 transition-colors"
+                className="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-semibold text-xs border border-slate-200 transition-colors shadow-xs inline-flex items-center space-x-1.5"
               >
-                Chat on WhatsApp
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{t.contact.whatsappAction}</span>
               </a>
             </div>
           </div>
@@ -396,56 +437,64 @@ export const HomePage: React.FC = () => {
 
       {/* 6. MEDIA SERVICES SHOWCASE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
-          <span className="text-xs font-semibold text-amber-400 uppercase tracking-widest">
-            Creative Capabilities
+        <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
+          <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
+            {t.media.badge}
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
-            Media &amp; Production Services
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+            {t.media.servicesTitle}
           </h2>
-          <p className="text-sm text-slate-400">
-            End-to-end creative production engineered for modern screens and discerning audiences.
+          <p className="text-sm text-slate-600">
+            {t.media.servicesSubtitle}
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-[#0e121c] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-amber-500/40 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Tv className="w-6 h-6" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-amber-300 transition-colors shadow-xs">
+            <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
+              <Tv className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-lg font-bold text-white">Broadcast Media</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Live broadcast engineering, outdoor broadcasting vans, television news programming, and multi-feed transmission.
+            <h3 className="font-serif text-base font-bold text-slate-900">
+              {t.media.broadcastingTitle}
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.media.broadcastingDesc}
             </p>
           </div>
 
-          <div className="bg-[#0e121c] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-amber-500/40 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Film className="w-6 h-6" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-amber-300 transition-colors shadow-xs">
+            <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
+              <Film className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-lg font-bold text-white">Film &amp; Television</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Feature films, docuseries, corporate commercial advertisements, scriptwriting, and color-graded post-production.
+            <h3 className="font-serif text-base font-bold text-slate-900">
+              {t.media.cinematographyTitle}
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.media.cinematographyDesc}
             </p>
           </div>
 
-          <div className="bg-[#0e121c] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-amber-500/40 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Music className="w-6 h-6" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-amber-300 transition-colors shadow-xs">
+            <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
+              <Music className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-lg font-bold text-white">Music &amp; Sound</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Acoustic soundstage tracking, mixing, spatial audio mastering, vocal recording, and soundtrack composition.
+            <h3 className="font-serif text-base font-bold text-slate-900">
+              {t.media.musicStudioTitle}
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.media.musicStudioDesc}
             </p>
           </div>
 
-          <div className="bg-[#0e121c] border border-white/10 rounded-2xl p-6 space-y-4 hover:border-amber-500/40 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Users className="w-6 h-6" />
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 space-y-3 hover:border-amber-300 transition-colors shadow-xs">
+            <div className="w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
+              <Users className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-lg font-bold text-white">Media Collaborations</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Co-production ventures, creative direction for brands, influencer campaigns, and cross-platform distribution.
+            <h3 className="font-serif text-base font-bold text-slate-900">
+              {t.media.brandCampaignsTitle}
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {t.media.brandCampaignsDesc}
             </p>
           </div>
         </div>
