@@ -54,6 +54,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
               alt={video.title}
               className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 

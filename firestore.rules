@@ -6,39 +6,45 @@ service cloud.firestore {
       return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    // Products: Public catalog, admin/portal management
+    // Products: Public read-only catalog. Managed securely via Firebase Console.
     match /products/{productId} {
       allow read: if true;
-      allow write: if isValidId(productId);
+      allow write: if false;
     }
 
-    // Videos: Public media showcase, admin/portal management
+    // Videos: Public read-only showcase. Managed securely via Firebase Console.
     match /videos/{videoId} {
       allow read: if true;
-      allow write: if isValidId(videoId);
+      allow write: if false;
     }
 
-    // Portfolio: Public project showcase, admin/portal management
+    // Portfolio: Public read-only project showcase. Managed securely via Firebase Console.
     match /portfolio/{portfolioId} {
       allow read: if true;
-      allow write: if isValidId(portfolioId);
+      allow write: if false;
     }
 
-    // Settings: Public configuration read, admin/portal updates
+    // Settings: Public read-only site configuration. Managed securely via Firebase Console.
     match /settings/{settingsId} {
       allow read: if true;
-      allow write: if isValidId(settingsId);
+      allow write: if false;
     }
 
-    // Enquiries: Public booking submission, admin/portal list and status updates
+    // Enquiries: Public booking & contact submissions (create only).
+    // Visitors can submit enquiries, but cannot read, update, or delete other people's inquiries.
+    // Management is done securely directly in Firebase Console.
     match /enquiries/{enquiryId} {
-      allow read: if true;
-      allow write: if isValidId(enquiryId);
+      allow create: if isValidId(enquiryId)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.email is string
+        && request.resource.data.phone is string;
+      allow read, update, delete: if false;
     }
 
-    // Admins registry: Read and write for administrative configurations
-    match /admins/{adminId} {
-      allow read, write: if isValidId(adminId);
+    // Deny all other collections by default
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

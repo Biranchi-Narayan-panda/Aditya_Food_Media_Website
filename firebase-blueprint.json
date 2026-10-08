@@ -99,18 +99,6 @@
         "updatedAt": { "type": "string" }
       },
       "required": ["id", "companyName", "phone", "email"]
-    },
-    "admin": {
-      "title": "Admin",
-      "description": "Administrator identity and access record",
-      "type": "object",
-      "properties": {
-        "uid": { "type": "string", "maxLength": 128 },
-        "email": { "type": "string", "maxLength": 150 },
-        "role": { "type": "string", "maxLength": 50 },
-        "createdAt": { "type": "string" }
-      },
-      "required": ["uid", "email", "role"]
     }
   },
   "firestore": {
@@ -133,10 +121,6 @@
     "/settings/{settingsId}": {
       "schema": "#/entities/siteSettings",
       "description": "Global website settings and contact channels"
-    },
-    "/admins/{adminId}": {
-      "schema": "#/entities/admin",
-      "description": "Admin authorization records"
     }
   }
 }

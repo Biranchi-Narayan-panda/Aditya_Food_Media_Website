@@ -1,12 +1,10 @@
 import React from 'react';
-import { AuthProvider } from './context/AuthContext';
 import { SiteProvider, useSite } from './context/SiteContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { VideoModal } from './components/VideoModal';
 import { ProductModal } from './components/ProductModal';
-import { AdminPinModal } from './components/AdminPinModal';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -19,7 +17,6 @@ import { VideosPage } from './pages/VideosPage';
 import { PortfolioPage } from './pages/PortfolioPage';
 import { ContactPage } from './pages/ContactPage';
 import { PrivacyPolicyPage, TermsPage } from './pages/LegalPages';
-import { AdminPage } from './pages/AdminPage';
 
 const AppContent: React.FC = () => {
   const { currentPath, navigate, t } = useSite();
@@ -60,9 +57,6 @@ const AppContent: React.FC = () => {
     }
     if (path === '/terms') {
       return <TermsPage />;
-    }
-    if (path === '/admin') {
-      return <AdminPage />;
     }
 
     // 404 Not Found Page
@@ -108,17 +102,14 @@ const AppContent: React.FC = () => {
       <FloatingWhatsApp />
       <VideoModal />
       <ProductModal />
-      <AdminPinModal />
     </div>
   );
 };
 
 export default function App() {
   return (
-    <AuthProvider>
-      <SiteProvider>
-        <AppContent />
-      </SiteProvider>
-    </AuthProvider>
+    <SiteProvider>
+      <AppContent />
+    </SiteProvider>
   );
 }

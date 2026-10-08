@@ -4,10 +4,6 @@ import {
   getDocs,
   getDoc,
   setDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
 } from 'firebase/firestore';
 import { db } from './config';
 import { handleFirestoreError, OperationType } from './errors';
@@ -32,41 +28,15 @@ export async function fetchProducts(): Promise<Product[]> {
     const colRef = collection(db, 'products');
     const snapshot = await getDocs(colRef);
     if (snapshot.empty) {
-      // Seed default products
-      for (const prod of INITIAL_PRODUCTS) {
-        await setDoc(doc(db, 'products', prod.id), prod);
-      }
       return INITIAL_PRODUCTS;
     }
     const products: Product[] = [];
-    snapshot.forEach(docSnap => {
+    snapshot.forEach((docSnap) => {
       products.push(docSnap.data() as Product);
     });
     return products.sort((a, b) => (a.displayOrder || 99) - (b.displayOrder || 99));
-  } catch (error) {
-    console.warn('Using local fallback for products if Firestore fails:', error);
+  } catch {
     return INITIAL_PRODUCTS;
-  }
-}
-
-export async function saveProduct(product: Product): Promise<void> {
-  const path = `products/${product.id}`;
-  try {
-    await setDoc(doc(db, 'products', product.id), {
-      ...product,
-      updatedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
-  }
-}
-
-export async function removeProduct(id: string): Promise<void> {
-  const path = `products/${id}`;
-  try {
-    await deleteDoc(doc(db, 'products', id));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
   }
 }
 
@@ -76,45 +46,15 @@ export async function fetchVideos(): Promise<VideoItem[]> {
     const colRef = collection(db, 'videos');
     const snapshot = await getDocs(colRef);
     if (snapshot.empty) {
-      for (const vid of INITIAL_VIDEOS) {
-        await setDoc(doc(db, 'videos', vid.id), vid);
-      }
       return INITIAL_VIDEOS;
     }
     const videos: VideoItem[] = [];
-    snapshot.forEach(docSnap => {
+    snapshot.forEach((docSnap) => {
       videos.push(docSnap.data() as VideoItem);
     });
     return videos.sort((a, b) => (a.displayOrder || 99) - (b.displayOrder || 99));
-  } catch (error) {
-    console.warn('Using local fallback for videos if Firestore fails:', error);
+  } catch {
     return INITIAL_VIDEOS;
-  }
-}
-
-export async function saveVideo(video: VideoItem): Promise<void> {
-  const path = `videos/${video.id}`;
-  const videoId = extractYouTubeId(video.youtubeUrl);
-  const updatedVideo: VideoItem = {
-    ...video,
-    youtubeVideoId: videoId,
-    thumbnailUrl: video.thumbnailUrl || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-    updatedAt: new Date().toISOString(),
-  };
-
-  try {
-    await setDoc(doc(db, 'videos', video.id), updatedVideo);
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
-  }
-}
-
-export async function removeVideo(id: string): Promise<void> {
-  const path = `videos/${id}`;
-  try {
-    await deleteDoc(doc(db, 'videos', id));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
   }
 }
 
@@ -124,40 +64,15 @@ export async function fetchPortfolio(): Promise<PortfolioItem[]> {
     const colRef = collection(db, 'portfolio');
     const snapshot = await getDocs(colRef);
     if (snapshot.empty) {
-      for (const item of INITIAL_PORTFOLIO) {
-        await setDoc(doc(db, 'portfolio', item.id), item);
-      }
       return INITIAL_PORTFOLIO;
     }
     const items: PortfolioItem[] = [];
-    snapshot.forEach(docSnap => {
+    snapshot.forEach((docSnap) => {
       items.push(docSnap.data() as PortfolioItem);
     });
     return items;
-  } catch (error) {
-    console.warn('Using local fallback for portfolio if Firestore fails:', error);
+  } catch {
     return INITIAL_PORTFOLIO;
-  }
-}
-
-export async function savePortfolioItem(item: PortfolioItem): Promise<void> {
-  const path = `portfolio/${item.id}`;
-  try {
-    await setDoc(doc(db, 'portfolio', item.id), {
-      ...item,
-      updatedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
-  }
-}
-
-export async function removePortfolioItem(id: string): Promise<void> {
-  const path = `portfolio/${id}`;
-  try {
-    await deleteDoc(doc(db, 'portfolio', id));
-  } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
   }
 }
 
@@ -177,63 +92,20 @@ export async function submitEnquiry(data: Omit<Enquiry, 'id' | 'createdAt' | 'st
     return enquiry;
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, path);
-  }
-}
-
-export async function fetchEnquiries(): Promise<Enquiry[]> {
-  try {
-    const colRef = collection(db, 'enquiries');
-    const q = query(colRef, orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    const enquiries: Enquiry[] = [];
-    snapshot.forEach(docSnap => {
-      enquiries.push(docSnap.data() as Enquiry);
-    });
-    return enquiries;
-  } catch {
-    // If indexing fails or fallback needed
-    try {
-      const snapshot = await getDocs(collection(db, 'enquiries'));
-      const enquiries: Enquiry[] = [];
-      snapshot.forEach(docSnap => {
-        enquiries.push(docSnap.data() as Enquiry);
-      });
-      return enquiries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    } catch (innerError) {
-      console.warn('Could not fetch Firestore enquiries, returning empty fallback:', innerError);
-      return [];
-    }
-  }
-}
-
-export async function updateEnquiryStatus(id: string, status: Enquiry['status']): Promise<void> {
-  const path = `enquiries/${id}`;
-  try {
-    await updateDoc(doc(db, 'enquiries', id), { status });
-  } catch (error) {
-    console.warn(`Could not update Firestore enquiry ${id} status:`, error);
-  }
-}
-
-export async function removeEnquiry(id: string): Promise<void> {
-  const path = `enquiries/${id}`;
-  try {
-    await deleteDoc(doc(db, 'enquiries', id));
-  } catch (error) {
-    console.warn(`Could not remove Firestore enquiry ${id}:`, error);
+    throw error;
   }
 }
 
 // ---------------- SETTINGS ----------------
 export async function fetchSiteSettings(): Promise<SiteSettings> {
-  const localCached = localStorage.getItem('aditya_site_settings');
   let fallback = INITIAL_SETTINGS;
-  if (localCached) {
-    try {
+  try {
+    const localCached = localStorage.getItem('aditya_site_settings');
+    if (localCached) {
       fallback = { ...INITIAL_SETTINGS, ...JSON.parse(localCached) };
-    } catch {
-      // ignore
     }
+  } catch {
+    // ignore
   }
 
   try {
@@ -241,28 +113,15 @@ export async function fetchSiteSettings(): Promise<SiteSettings> {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const data = docSnap.data() as SiteSettings;
-      localStorage.setItem('aditya_site_settings', JSON.stringify(data));
+      try {
+        localStorage.setItem('aditya_site_settings', JSON.stringify(data));
+      } catch {
+        // ignore
+      }
       return data;
-    } else {
-      await setDoc(docRef, fallback);
-      return fallback;
     }
-  } catch (error) {
-    console.warn('Using local fallback for settings:', error);
     return fallback;
-  }
-}
-
-export async function updateSiteSettings(settings: SiteSettings): Promise<void> {
-  localStorage.setItem('aditya_site_settings', JSON.stringify(settings));
-  const path = 'settings/general';
-  try {
-    await setDoc(doc(db, 'settings', 'general'), {
-      ...settings,
-      updatedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.warn('Firestore write warning:', error);
-    handleFirestoreError(error, OperationType.WRITE, path);
+  } catch {
+    return fallback;
   }
 }

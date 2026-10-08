@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
-import { useAuth } from '../context/AuthContext';
 import { AdityaMainLogo, AdityaFoodsBadge, AdityaMediaBadge } from './BrandLogos';
 import {
   Menu,
   X,
   MessageCircle,
   ChevronDown,
-  ShieldCheck,
   Milk,
   Film,
   PhoneCall,
@@ -19,13 +17,10 @@ export const Navbar: React.FC = () => {
     currentPath,
     navigate,
     getWhatsAppUrl,
-    openAdminPortal,
-    isAdminPinUnlocked,
     language,
     setLanguage,
     t,
   } = useSite();
-  const { isAdmin } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [foodsDropdownOpen, setFoodsDropdownOpen] = useState(false);
@@ -303,26 +298,9 @@ export const Navbar: React.FC = () => {
               <PhoneCall className="w-3.5 h-3.5" />
               <span>{t.nav.getInTouch}</span>
             </button>
-
-            {/* Admin Portal Button */}
-            <button
-              onClick={openAdminPortal}
-              title={
-                isAdmin && isAdminPinUnlocked
-                  ? t.nav.adminActive
-                  : `${t.nav.adminPortal} (PIN Protected)`
-              }
-              className={`p-2 rounded-xl border transition-all ${
-                isAdmin && isAdminPinUnlocked
-                  ? 'border-amber-400 bg-amber-50 text-amber-700'
-                  : 'border-slate-200 text-slate-400 hover:text-slate-800 hover:bg-slate-50'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-            </button>
           </div>
 
-          {/* Mobile Right Controls: Language Switcher + Admin + Hamburger */}
+          {/* Mobile Right Controls: Language Switcher + Hamburger */}
           <div className="flex items-center space-x-1.5 lg:hidden">
             {/* Compact Mobile Language Switcher */}
             <button
@@ -333,14 +311,6 @@ export const Navbar: React.FC = () => {
             >
               <Languages className="w-3.5 h-3.5 text-amber-700" />
               <span>{language === 'or' ? 'EN' : 'ଓଡ଼ିଆ'}</span>
-            </button>
-
-            <button
-              onClick={openAdminPortal}
-              className="p-2 text-slate-500 hover:text-slate-900 rounded-lg"
-              title={t.nav.adminPortal}
-            >
-              <ShieldCheck className="w-5 h-5" />
             </button>
 
             <button

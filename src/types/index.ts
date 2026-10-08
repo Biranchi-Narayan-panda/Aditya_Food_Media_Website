@@ -12,7 +12,7 @@ export interface Product {
   specifications?: string;
   createdAt?: string;
   updatedAt?: string;
-  // Bilingual Odia Fields (Editable in Admin)
+  // Bilingual Odia Fields
   nameOr?: string;
   categoryOr?: string;
   descriptionOr?: string;
@@ -61,8 +61,6 @@ export interface Enquiry {
   preferredContact?: 'whatsapp' | 'email' | 'phone';
   status: 'pending' | 'contacted' | 'resolved';
   createdAt: string;
-  dbSource?: 'superbase' | 'firebase';
-  tableName?: string;
 }
 
 export interface SiteSettings {
@@ -84,10 +82,4 @@ export interface SiteSettings {
   companyNameOr?: string;
   taglineOr?: string;
   addressOr?: string;
-}
-
-export interface AdminUser {
-  uid: string;
-  email: string;
-  role: string;
 }

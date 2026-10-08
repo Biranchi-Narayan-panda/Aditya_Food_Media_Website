@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useSite } from '../context/SiteContext';
 import { submitEnquiry } from '../firebase/services';
-import { saveAppointmentToSuperbase } from '../supabase/client';
 import {
   Compass,
   CheckCircle2,
@@ -11,7 +10,6 @@ import {
   MessageCircle,
   Send,
   AlertCircle,
-  Database,
 } from 'lucide-react';
 
 export const ConsultationPage: React.FC = () => {
@@ -27,7 +25,6 @@ export const ConsultationPage: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
-  const [superbaseSynced, setSuperbaseSynced] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,24 +42,7 @@ export const ConsultationPage: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // 1. Save to SuperBase Backend table
-      const superbaseResult = await saveAppointmentToSuperbase({
-        name: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        businessName: businessName.trim() || undefined,
-        consultationTopic: consultationType,
-        preferredContact,
-        message: projectDetails.trim(),
-        source: 'Consultation & Appointment Booking Page',
-        status: 'pending',
-      });
-
-      if (superbaseResult.success) {
-        setSuperbaseSynced(true);
-      }
-
-      // 2. Also record in local database services for admin panel consistency
+      // Save directly to Firebase Firestore
       const res = await submitEnquiry({
         name: fullName.trim(),
         email: email.trim(),
@@ -171,14 +151,6 @@ export const ConsultationPage: React.FC = () => {
                 <p className="text-xs text-emerald-800">
                   Reference ID: <span className="font-mono font-semibold">{successId}</span>
                 </p>
-                <div className="flex items-center space-x-1.5 pt-0.5 text-[11px] text-emerald-700">
-                  <Database className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>
-                    {superbaseSynced
-                      ? 'Appointment details successfully saved to SuperBase backend table.'
-                      : 'Appointment logged & synced with backend.'}
-                  </span>
-                </div>
               </div>
             </div>
           )}

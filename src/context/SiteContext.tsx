@@ -18,12 +18,6 @@ interface SiteContextType {
   getWhatsAppUrl: (message?: string) => string;
   currentPath: string;
   navigate: (path: string) => void;
-  isAdminPinUnlocked: boolean;
-  isAdminPinModalOpen: boolean;
-  openAdminPortal: () => void;
-  closeAdminPinModal: () => void;
-  unlockAdminPortal: () => void;
-  lockAdminPortal: () => void;
   // Bilingual i18n
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -102,12 +96,6 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
 
-  // Admin PIN verification state (session-persisted)
-  const [isAdminPinUnlocked, setIsAdminPinUnlocked] = useState<boolean>(() => {
-    return sessionStorage.getItem('aditya_admin_pin_verified') === 'true';
-  });
-  const [isAdminPinModalOpen, setIsAdminPinModalOpen] = useState<boolean>(false);
-
   // Synchronize path from window.location.hash or pathname
   const [currentPath, setCurrentPath] = useState<string>(() => {
     const hash = window.location.hash.replace(/^#/, '');
@@ -120,38 +108,6 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentPath(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
-
-  const openAdminPortal = useCallback(() => {
-    const verified = sessionStorage.getItem('aditya_admin_pin_verified') === 'true';
-    if (verified) {
-      setIsAdminPinUnlocked(true);
-      navigate('/admin');
-    } else {
-      setIsAdminPinModalOpen(true);
-    }
-  }, [navigate]);
-
-  const closeAdminPinModal = useCallback(() => {
-    setIsAdminPinModalOpen(false);
-    // If the user was trying to access /admin directly without unlocking, redirect to home
-    if (currentPath === '/admin' && !isAdminPinUnlocked) {
-      navigate('/');
-    }
-  }, [currentPath, isAdminPinUnlocked, navigate]);
-
-  const unlockAdminPortal = useCallback(() => {
-    sessionStorage.setItem('aditya_admin_pin_verified', 'true');
-    setIsAdminPinUnlocked(true);
-    setIsAdminPinModalOpen(false);
-    navigate('/admin');
-  }, [navigate]);
-
-  const lockAdminPortal = useCallback(() => {
-    sessionStorage.removeItem('aditya_admin_pin_verified');
-    setIsAdminPinUnlocked(false);
-    setIsAdminPinModalOpen(false);
-    navigate('/');
-  }, [navigate]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -218,12 +174,6 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getWhatsAppUrl,
         currentPath,
         navigate,
-        isAdminPinUnlocked,
-        isAdminPinModalOpen,
-        openAdminPortal,
-        closeAdminPinModal,
-        unlockAdminPortal,
-        lockAdminPortal,
         language,
         setLanguage,
         t,

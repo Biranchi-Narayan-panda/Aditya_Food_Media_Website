@@ -19,8 +19,6 @@ export interface TranslationDictionary {
     contact: string;
     getInTouch: string;
     whatsapp: string;
-    adminPortal: string;
-    adminActive: string;
     menu: string;
     close: string;
     officialDivision: string;
@@ -223,7 +221,6 @@ export interface TranslationDictionary {
     rightsReserved: string;
     privacyPolicy: string;
     termsConditions: string;
-    adminPortal: string;
     backToTop: string;
   };
 
@@ -242,33 +239,6 @@ export interface TranslationDictionary {
     viewAll: string;
     verified: string;
     popular: string;
-  };
-
-  // Admin Portal
-  admin: {
-    portalTitle: string;
-    securityGateTitle: string;
-    securityGateSubtitle: string;
-    enterPinDesc: string;
-    pinPlaceholder: string;
-    pinDigitsPrompt: string;
-    incorrectPin: string;
-    pinVerified: string;
-    clear: string;
-    lockPortal: string;
-    signOut: string;
-    languageControlTitle: string;
-    languageControlDesc: string;
-    activeLanguage: string;
-    defaultLanguageNotice: string;
-    switchToOdia: string;
-    switchToEnglish: string;
-    overviewTab: string;
-    productsTab: string;
-    videosTab: string;
-    portfolioTab: string;
-    enquiriesTab: string;
-    settingsTab: string;
   };
 }
 
@@ -292,8 +262,6 @@ export const translations: Record<Language, TranslationDictionary> = {
       contact: 'ଯୋଗାଯୋଗ',
       getInTouch: 'ସମ୍ପର୍କ କରନ୍ତୁ',
       whatsapp: 'ହ୍ୱାଟ୍ସଆପ୍',
-      adminPortal: 'ଆଡମିନ୍ ପୋର୍ଟାଲ',
-      adminActive: 'ଆଡମିନ୍ (ସକ୍ରିୟ)',
       menu: 'ମେନୁ',
       close: 'ବନ୍ଦ କରନ୍ତୁ',
       officialDivision: 'ଅଫିସିଆଲ୍ ବିଭାଗ',
@@ -482,7 +450,6 @@ export const translations: Record<Language, TranslationDictionary> = {
       rightsReserved: 'ସର୍ବସ୍ୱତ୍ୱ ସଂରକ୍ଷିତ।',
       privacyPolicy: 'ଗୋପନୀୟତା ନୀତି',
       termsConditions: 'ନିୟମ ଓ ସର୍ତ୍ତାବଳୀ',
-      adminPortal: 'ଆଡମିନ୍ ପୋର୍ଟାଲ',
       backToTop: 'ଉପରକୁ ଯାଆନ୍ତୁ',
     },
     common: {
@@ -499,31 +466,6 @@ export const translations: Record<Language, TranslationDictionary> = {
       viewAll: 'ସବୁ ଦେଖନ୍ତୁ',
       verified: 'ପ୍ରମାଣିତ',
       popular: 'ଲୋକପ୍ରିୟ',
-    },
-    admin: {
-      portalTitle: 'ଆଦିତ୍ୟ ମ୍ୟାନେଜମେଣ୍ଟ ପୋର୍ଟାଲ',
-      securityGateTitle: 'ସୁରକ୍ଷା ଯାଞ୍ଚ (Security Gate)',
-      securityGateSubtitle: 'ସ୍ଥାୟୀ ୪-ଅଙ୍କ ବିଶିଷ୍ଟ ପିନ୍ ଆବଶ୍ୟକ',
-      enterPinDesc: 'ଆଡମିନ୍ ପୋର୍ଟାଲ୍ ଖୋଲିବା ପାଇଁ ଆପଣଙ୍କର ୪-ଅଙ୍କ ବିଶିଷ୍ଟ ଗୋପନୀୟ ପିନ୍ ପ୍ରବେଶ କରନ୍ତୁ।',
-      pinPlaceholder: 'ପିନ୍ ପ୍ରବେଶ କରନ୍ତୁ',
-      pinDigitsPrompt: '୪-ଅଙ୍କ ବିଶିଷ୍ଟ ପିନ୍',
-      incorrectPin: 'ଭୁଲ୍ ପିନ୍। ପ୍ରବେଶ ଅନୁମୋଦିତ ନୁହେଁ।',
-      pinVerified: 'ପିନ୍ ଯାଞ୍ଚ ସଫଳ ହେଲା • ପୋର୍ଟାଲ୍ ଖୋଲୁଛି...',
-      clear: 'ପରିଷ୍କାର କରନ୍ତୁ',
-      lockPortal: 'ପୋର୍ଟାଲ୍ ଲକ୍ କରନ୍ତୁ',
-      signOut: 'ସାଇନ୍ ଆଉଟ୍',
-      languageControlTitle: 'ୱେବସାଇଟ୍ ଭାଷା ନିୟନ୍ତ୍ରଣ (Language Control)',
-      languageControlDesc: 'ୱେବସାଇଟର ଡିଫଲ୍ଟ ଭାଷା ଓଡ଼ିଆ ରହିଛି। ଆପଣ ଏଠାରେ ଉଭୟ ଓଡ଼ିଆ ଏବଂ ଇଂରାଜୀ ଭାଷା ପ୍ରିଭ୍ୟୁ କରିପାରିବେ।',
-      activeLanguage: 'ସକ୍ରିୟ ଭାଷା:',
-      defaultLanguageNotice: 'ଡିଫଲ୍ଟ ଭାଷା: ଓଡ଼ିଆ (Odia)',
-      switchToOdia: 'ଓଡ଼ିଆ କୁ ବଦଳାନ୍ତୁ',
-      switchToEnglish: 'Switch to English',
-      overviewTab: 'ସମୀକ୍ଷା',
-      productsTab: 'ଉତ୍ପାଦଗୁଡ଼ିକ',
-      videosTab: 'ଭିଡିଓଗୁଡ଼ିକ',
-      portfolioTab: 'ପୋର୍ଟଫୋଲିଓ',
-      enquiriesTab: 'ଅନୁସନ୍ଧାନ (Inquiries)',
-      settingsTab: 'ୱେବସାଇଟ୍ ସେଟିଙ୍ଗ୍ସ',
     },
   },
 
@@ -546,8 +488,6 @@ export const translations: Record<Language, TranslationDictionary> = {
       contact: 'Contact Us',
       getInTouch: 'Get in Touch',
       whatsapp: 'WhatsApp',
-      adminPortal: 'Admin Portal',
-      adminActive: 'Admin (Active)',
       menu: 'Menu',
       close: 'Close',
       officialDivision: 'Official Division',
@@ -736,7 +676,6 @@ export const translations: Record<Language, TranslationDictionary> = {
       rightsReserved: 'All rights reserved.',
       privacyPolicy: 'Privacy Policy',
       termsConditions: 'Terms & Conditions',
-      adminPortal: 'Admin Portal',
       backToTop: 'Back to Top',
     },
     common: {
@@ -753,31 +692,6 @@ export const translations: Record<Language, TranslationDictionary> = {
       viewAll: 'View All',
       verified: 'Verified',
       popular: 'Popular',
-    },
-    admin: {
-      portalTitle: 'Aditya Management Portal',
-      securityGateTitle: 'Security Gate',
-      securityGateSubtitle: 'Permanent 4-Digit PIN Required',
-      enterPinDesc: 'Enter your authorization PIN to unlock the Aditya Management Portal.',
-      pinPlaceholder: 'Enter PIN',
-      pinDigitsPrompt: '4-Digit PIN',
-      incorrectPin: 'Incorrect PIN. Access Denied.',
-      pinVerified: 'PIN Verified • Accessing Portal...',
-      clear: 'Clear',
-      lockPortal: 'Lock Portal',
-      signOut: 'Sign Out',
-      languageControlTitle: 'Website Language Settings',
-      languageControlDesc: 'The website default language is Odia (ଓଡ଼ିଆ). You can preview the website in both supported languages below.',
-      activeLanguage: 'Active Preview Language:',
-      defaultLanguageNotice: 'Default Language: Odia (ଓଡ଼ିଆ)',
-      switchToOdia: 'Switch to Odia',
-      switchToEnglish: 'Switch to English',
-      overviewTab: 'Overview',
-      productsTab: 'Products',
-      videosTab: 'Videos',
-      portfolioTab: 'Portfolio',
-      enquiriesTab: 'Inquiries',
-      settingsTab: 'Site Settings',
     },
   },
 };

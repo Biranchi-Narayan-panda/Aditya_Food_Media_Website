@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSite } from '../context/SiteContext';
 import { ProductCard } from '../components/ProductCard';
 import { VideoCard } from '../components/VideoCard';
@@ -22,11 +22,15 @@ export const HomePage: React.FC = () => {
   const { products, videos, navigate, getWhatsAppUrl, t, language } = useSite();
   const [heroMode, setHeroMode] = useState<'both' | 'foods' | 'media'>('both');
 
-  const featuredProducts = products.filter((p) => p.featured).slice(0, 4);
-  const displayProducts = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 4);
+  const displayProducts = useMemo(() => {
+    const featured = products.filter((p) => p.featured).slice(0, 4);
+    return featured.length > 0 ? featured : products.slice(0, 4);
+  }, [products]);
 
-  const featuredVideos = videos.filter((v) => v.featured).slice(0, 3);
-  const displayVideos = featuredVideos.length > 0 ? featuredVideos : videos.slice(0, 3);
+  const displayVideos = useMemo(() => {
+    const featured = videos.filter((v) => v.featured).slice(0, 3);
+    return featured.length > 0 ? featured : videos.slice(0, 3);
+  }, [videos]);
 
   return (
     <div className="space-y-20 pb-16">

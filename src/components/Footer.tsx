@@ -12,14 +12,13 @@ import {
   Linkedin,
   Twitter,
   ArrowUp,
-  ShieldCheck,
   Milk,
   Film,
   Languages,
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { settings, navigate, getWhatsAppUrl, openAdminPortal, t, language, setLanguage } = useSite();
+  const { settings, navigate, getWhatsAppUrl, t, language, setLanguage } = useSite();
   const currentYear = new Date().getFullYear();
 
   const scrollToTop = () => {
@@ -264,7 +263,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom bar with Language Switcher, Legal, Admin, and Back to Top */}
+        {/* Bottom bar with Language Switcher, Legal, and Back to Top */}
         <div className="pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <div className="flex items-center space-x-3">
             <span>&copy; {currentYear} Aditya Food &amp; Media. {t.footer.rightsReserved}</span>
@@ -304,14 +303,6 @@ export const Footer: React.FC = () => {
               className="hover:text-slate-800 transition-colors cursor-pointer"
             >
               {t.footer.termsConditions}
-            </button>
-            <button
-              type="button"
-              onClick={openAdminPortal}
-              className="hover:text-amber-700 transition-colors flex items-center space-x-1 cursor-pointer font-medium"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-              <span>{t.footer.adminPortal}</span>
             </button>
             <button
               type="button"

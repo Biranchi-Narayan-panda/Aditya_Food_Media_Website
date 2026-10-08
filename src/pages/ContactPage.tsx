@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useSite } from '../context/SiteContext';
 import { submitEnquiry } from '../firebase/services';
-import { saveAppointmentToSuperbase } from '../supabase/client';
 import {
   Phone,
   Mail,
@@ -11,7 +10,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  Database,
 } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
@@ -26,7 +24,6 @@ export const ContactPage: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
-  const [superbaseSynced, setSuperbaseSynced] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,23 +41,7 @@ export const ContactPage: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // 1. Save to SuperBase
-      const superbaseResult = await saveAppointmentToSuperbase({
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        consultationTopic: enquiryType,
-        preferredContact,
-        message: message.trim(),
-        source: 'Contact Page Form',
-        status: 'pending',
-      });
-
-      if (superbaseResult.success) {
-        setSuperbaseSynced(true);
-      }
-
-      // 2. Also save to app database
+      // Save directly to Firebase Firestore
       const res = await submitEnquiry({
         name: name.trim(),
         email: email.trim(),
@@ -206,14 +187,6 @@ export const ContactPage: React.FC = () => {
                     <p className="text-xs text-emerald-800">
                       Reference ID: <span className="font-mono font-semibold">{successId}</span>
                     </p>
-                    <div className="flex items-center space-x-1.5 pt-0.5 text-[11px] text-emerald-700">
-                      <Database className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>
-                        {superbaseSynced
-                          ? 'Inquiry successfully saved to SuperBase backend table.'
-                          : 'Inquiry received & synced with backend.'}
-                      </span>
-                    </div>
                   </div>
                 </div>
               )}
