@@ -232,20 +232,20 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2.5 text-sm text-slate-600">
               <li className="flex items-start space-x-2.5">
                 <Phone className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <a href={`tel:${settings.phone || '0674-2915041'}`} className="hover:text-slate-900 transition-colors">
-                  {settings.phone || '0674-2915041'}
+                <a href={`tel:${settings.phone || '674-2915041'}`} className="hover:text-slate-900 transition-colors">
+                  {settings.phone || '674-2915041'}
                 </a>
               </li>
               <li className="flex items-start space-x-2.5">
                 <Mail className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <a href={`mailto:${settings.email || 'personal@adityafoodsandmedia.com'}`} className="hover:text-slate-900 transition-colors break-all">
-                  {settings.email || 'personal@adityafoodsandmedia.com'}
+                <a href={`mailto:${settings.email || 'personal@adityafoodandmedia.com'}`} className="hover:text-slate-900 transition-colors break-all">
+                  {settings.email || 'personal@adityafoodandmedia.com'}
                 </a>
               </li>
               <li className="flex items-start space-x-2.5">
                 <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <span className="text-xs leading-relaxed text-slate-600">
-                  {settings.address || 'Bhubaneswar, Odisha, India'}
+                  {settings.address || 'Aditya Tower, Chandrasekharpur, Bhubaneswar, Odisha 751024'}
                 </span>
               </li>
               <li className="pt-1">

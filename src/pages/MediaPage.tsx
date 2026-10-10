@@ -11,12 +11,13 @@ import {
   ArrowRight,
   Camera,
   Clapperboard,
+  Youtube,
 } from 'lucide-react';
 
 export const MediaPage: React.FC = () => {
   const { videos, navigate, setActiveVideo, t } = useSite();
 
-  const previewVideos = videos.slice(0, 3);
+  const previewVideos = videos.slice(0, 4);
   const heroVideo = videos[0] || null;
 
   return (
@@ -185,10 +186,23 @@ export const MediaPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {previewVideos.map((video) => (
             <VideoCard key={video.id} video={video} />
           ))}
+        </div>
+
+        {/* Watch Full Content on YouTube CTA */}
+        <div className="mt-8 text-center pt-2">
+          <a
+            href="https://youtube.com/@ss17523?si=ZnG7pZu12DHFMbuP"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-md hover:scale-105 cursor-pointer"
+          >
+            <Youtube className="w-4 h-4" />
+            <span>Watch Full Content on YouTube</span>
+          </a>
         </div>
       </section>
     </div>

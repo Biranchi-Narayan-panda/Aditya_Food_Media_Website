@@ -10,13 +10,12 @@ export const VideosPage: React.FC = () => {
 
   const categories = [
     'All',
+    'Comedy & Entertainment',
     'Food',
     'Film & Television',
     'Music',
     'Interviews',
     'Events',
-    'Entertainment',
-    'Promotional Videos',
   ];
 
   const filteredVideos = videos.filter((v) => {
@@ -83,8 +82,24 @@ export const VideosPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-1.5 text-xs font-bold text-amber-300">
-                  <span>{t.media.watchVideo} &rarr;</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  {featuredHighlight.viewCount && (
+                    <span className="px-3 py-1 rounded-lg bg-black/60 backdrop-blur-md text-amber-300 text-xs font-bold border border-white/20">
+                      {featuredHighlight.viewCount}
+                    </span>
+                  )}
+                  <a
+                    href={featuredHighlight.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow-md"
+                  >
+                    <span>Watch on YouTube</span>
+                  </a>
+                  <div className="flex items-center space-x-1.5 text-xs font-bold text-amber-300">
+                    <span>{t.media.watchVideo} &rarr;</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -144,6 +159,36 @@ export const VideosPage: React.FC = () => {
             ))}
           </div>
         )}
+      </section>
+
+      {/* “Watch Full Content” Call to Action */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-4">
+        <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50 border border-amber-200/90 rounded-3xl p-8 sm:p-10 shadow-xs space-y-4 max-w-2xl mx-auto">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-semibold border border-red-200">
+            <Youtube className="w-3.5 h-3.5 text-red-600" />
+            <span>Official Channel Showcase</span>
+          </div>
+
+          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+            Enjoying Our Comedy &amp; Entertainment?
+          </h3>
+
+          <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+            Discover full-length episodes, exclusive bloopers, comedic sketches, and cultural releases on our official YouTube channel.
+          </p>
+
+          <div className="pt-2">
+            <a
+              href="https://youtube.com/@ss17523?si=ZnG7pZu12DHFMbuP"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md hover:scale-105 cursor-pointer"
+            >
+              <Youtube className="w-4 h-4" />
+              <span>Watch Full Content on YouTube</span>
+            </a>
+          </div>
+        </div>
       </section>
     </div>
   );

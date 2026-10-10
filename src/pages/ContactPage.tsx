@@ -100,10 +100,10 @@ export const ContactPage: React.FC = () => {
                       {t.contact.phoneLabel}
                     </span>
                     <a
-                      href={`tel:${settings.phone || '0674-2915041'}`}
+                      href={`tel:${settings.phone || '674-2915041'}`}
                       className="text-slate-900 hover:text-amber-700 font-semibold"
                     >
-                      {settings.phone || '0674-2915041'}
+                      {settings.phone || '674-2915041'}
                     </a>
                   </div>
                 </div>
@@ -115,10 +115,10 @@ export const ContactPage: React.FC = () => {
                       {t.contact.emailLabel}
                     </span>
                     <a
-                      href={`mailto:${settings.email || 'personal@adityafoodsandmedia.com'}`}
+                      href={`mailto:${settings.email || 'personal@adityafoodandmedia.com'}`}
                       className="text-slate-900 hover:text-emerald-700 font-semibold break-all"
                     >
-                      {settings.email || 'personal@adityafoodsandmedia.com'}
+                      {settings.email || 'personal@adityafoodandmedia.com'}
                     </a>
                   </div>
                 </div>
@@ -130,7 +130,7 @@ export const ContactPage: React.FC = () => {
                       {t.contact.officeLabel}
                     </span>
                     <span className="text-slate-800 leading-relaxed text-xs">
-                      {settings.address || 'Aditya Tower, Bhubaneswar, Odisha 751024'}
+                      {settings.address || 'Aditya Tower, Chandrasekharpur, Bhubaneswar, Odisha 751024'}
                     </span>
                   </div>
                 </div>

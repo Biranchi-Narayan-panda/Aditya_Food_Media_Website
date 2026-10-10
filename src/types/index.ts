@@ -29,6 +29,7 @@ export interface VideoItem {
   description: string;
   thumbnailUrl: string;
   category: string;
+  viewCount?: string;
   publicationDate?: string;
   duration?: string;
   featured?: boolean;

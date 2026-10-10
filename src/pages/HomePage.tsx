@@ -16,10 +16,12 @@ import {
   Music,
   Users,
   MessageCircle,
+  Youtube,
+  Play,
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
-  const { products, videos, navigate, getWhatsAppUrl, t, language } = useSite();
+  const { products, videos, setActiveVideo, navigate, getWhatsAppUrl, t, language } = useSite();
   const [heroMode, setHeroMode] = useState<'both' | 'foods' | 'media'>('both');
 
   const displayProducts = useMemo(() => {
@@ -27,10 +29,14 @@ export const HomePage: React.FC = () => {
     return featured.length > 0 ? featured : products.slice(0, 4);
   }, [products]);
 
-  const displayVideos = useMemo(() => {
-    const featured = videos.filter((v) => v.featured).slice(0, 3);
-    return featured.length > 0 ? featured : videos.slice(0, 3);
+  const featuredVideo = useMemo(() => {
+    return videos.find((v) => v.featured) || videos[0];
   }, [videos]);
+
+  const additionalVideos = useMemo(() => {
+    if (!featuredVideo) return videos.slice(1, 5);
+    return videos.filter((v) => v.id !== featuredVideo.id).slice(0, 4);
+  }, [videos, featuredVideo]);
 
   return (
     <div className="space-y-20 pb-16">
@@ -366,36 +372,107 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. ADITYA MEDIA: INTERACTIVE YOUTUBE VIDEO GALLERY */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-5 border-b border-slate-200 gap-4">
+      {/* 4. ADITYA MEDIA: COMEDY & ENTERTAINMENT VIDEO SHOWCASE */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between pb-5 border-b border-slate-200 gap-4">
           <div>
             <div className="flex items-center space-x-2 text-xs font-bold text-amber-800 uppercase tracking-wider mb-1.5">
               <AdityaMediaBadge className="w-14 h-auto" />
               <span>{t.home.mediaIntroKicker}</span>
             </div>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
-              {t.nav.videoGallery}
+              {t.media.brandCampaignsTitle}
             </h2>
-            <p className="text-sm text-slate-600 mt-1 max-w-xl">
-              {t.media.latestReelsSubtitle}
+            <p className="text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+              {t.media.brandCampaignsDesc}
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => navigate('/media/videos')}
-            className="inline-flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 hover:text-amber-950 transition-colors cursor-pointer"
+            className="inline-flex items-center space-x-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 hover:text-amber-950 transition-colors cursor-pointer shrink-0"
           >
             <span>{t.home.viewAllVideos}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayVideos.map((video) => (
+        {/* Featured Most-Viewed Video */}
+        {featuredVideo && (
+          <div
+            onClick={() => setActiveVideo(featuredVideo)}
+            className="group relative rounded-3xl overflow-hidden border border-slate-200 bg-white cursor-pointer shadow-xs hover:shadow-md transition-all"
+          >
+            <div className="aspect-21/9 sm:aspect-16/7 w-full relative">
+              <img
+                src={featuredVideo.thumbnailUrl}
+                alt={featuredVideo.title}
+                className="w-full h-full object-cover transform group-hover:scale-102 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-amber-500 group-hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-200">
+                  <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-slate-950 ml-1" />
+                </div>
+              </div>
+
+              <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-white">
+                <div className="max-w-2xl space-y-1.5">
+                  <div className="flex items-center space-x-2">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold">
+                      {featuredVideo.category}
+                    </span>
+                    {featuredVideo.viewCount && (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-black/60 backdrop-blur-md text-amber-300 text-xs font-bold border border-white/20">
+                        {featuredVideo.viewCount}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-serif text-lg sm:text-2xl font-bold leading-snug">
+                    {featuredVideo.title}
+                  </h3>
+                  <p className="text-xs text-slate-200 line-clamp-2 hidden sm:block">
+                    {featuredVideo.description}
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-3 shrink-0">
+                  <a
+                    href={featuredVideo.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow-md"
+                  >
+                    <Youtube className="w-4 h-4" />
+                    <span>Watch on YouTube</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Top 3–4 Additional Popular Videos */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {additionalVideos.map((video) => (
             <VideoCard key={video.id} video={video} />
           ))}
+        </div>
+
+        {/* Watch Full Content on YouTube Call To Action */}
+        <div className="mt-8 text-center pt-2">
+          <a
+            href="https://youtube.com/@ss17523?si=ZnG7pZu12DHFMbuP"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs tracking-wider uppercase transition-all shadow-md hover:scale-105 cursor-pointer"
+          >
+            <Youtube className="w-4 h-4" />
+            <span>Watch Full Content on YouTube</span>
+          </a>
         </div>
       </section>
 

@@ -43,7 +43,7 @@ export const PrivacyPolicyPage: React.FC = () => {
         <section className="space-y-2">
           <h2 className="font-serif text-lg font-bold text-slate-900">4. Contact & Inquiries</h2>
           <p>
-            If you have questions regarding this privacy policy or your personal data, contact us at <a href="mailto:personal@adityafoodsandmedia.com" className="text-emerald-700 font-semibold underline">personal@adityafoodsandmedia.com</a> or telephone <span className="font-semibold text-slate-900">0674-2915041</span>.
+            If you have questions regarding this privacy policy or your personal data, contact us at <a href="mailto:personal@adityafoodandmedia.com" className="text-emerald-700 font-semibold underline">personal@adityafoodandmedia.com</a> or telephone <a href="tel:674-2915041" className="font-semibold text-slate-900 underline">674-2915041</a>.
           </p>
         </section>
       </div>

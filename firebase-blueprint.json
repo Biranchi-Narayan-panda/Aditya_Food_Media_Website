@@ -34,6 +34,7 @@
         "description": { "type": "string", "maxLength": 2000 },
         "thumbnailUrl": { "type": "string", "maxLength": 1000 },
         "category": { "type": "string", "maxLength": 80 },
+        "viewCount": { "type": "string", "maxLength": 50 },
         "publicationDate": { "type": "string", "maxLength": 50 },
         "duration": { "type": "string", "maxLength": 30 },
         "featured": { "type": "boolean" },
