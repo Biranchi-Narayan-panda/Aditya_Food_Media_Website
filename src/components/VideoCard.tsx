@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { VideoItem } from '../types';
 import { useSite } from '../context/SiteContext';
 import { Play, Film, ExternalLink, Clock } from 'lucide-react';
@@ -7,35 +7,94 @@ interface VideoCardProps {
   video: VideoItem;
 }
 
+const HOVER_START_DELAY_MS = 250;
+const HOVER_PLAY_DURATION_MS = 15000; // Plays for 15 seconds on hover
+
 export const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const { setActiveVideo, t } = useSite();
+  const [isHoverPlaying, setIsHoverPlaying] = useState(false);
+  const startTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const stopTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearTimers = () => {
+    if (startTimerRef.current) {
+      clearTimeout(startTimerRef.current);
+      startTimerRef.current = null;
+    }
+    if (stopTimerRef.current) {
+      clearTimeout(stopTimerRef.current);
+      stopTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => clearTimers();
+  }, []);
+
+  const handleMouseEnter = () => {
+    clearTimers();
+    startTimerRef.current = setTimeout(() => {
+      setIsHoverPlaying(true);
+      // Auto-stop preview after some time (15 seconds)
+      stopTimerRef.current = setTimeout(() => {
+        setIsHoverPlaying(false);
+      }, HOVER_PLAY_DURATION_MS);
+    }, HOVER_START_DELAY_MS);
+  };
+
+  const handleMouseLeave = () => {
+    clearTimers();
+    setIsHoverPlaying(false);
+  };
 
   const handleClick = () => {
+    clearTimers();
+    setIsHoverPlaying(false);
     setActiveVideo(video);
   };
 
   return (
     <div
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className="group relative bg-white border border-slate-200/90 hover:border-amber-400 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col cursor-pointer"
       onClick={handleClick}
     >
-      {/* 16:9 Video Thumbnail Container */}
+      {/* 16:9 Video Thumbnail or Hover Preview Container */}
       <div className="relative aspect-video w-full bg-slate-900 overflow-hidden">
-        <img
-          src={video.thumbnailUrl || `https://img.youtube.com/vi/${video.youtubeVideoId}/hqdefault.jpg`}
-          alt={video.title}
-          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
-          loading="lazy"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-        {/* Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-amber-500/90 group-hover:bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-200">
-            <Play className="w-5 h-5 fill-slate-950 ml-0.5" />
+        {isHoverPlaying ? (
+          <div className="w-full h-full pointer-events-none relative">
+            <iframe
+              src={`https://www.youtube.com/embed/${video.youtubeVideoId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${video.youtubeVideoId}`}
+              title={video.title}
+              className="w-full h-full border-0 scale-105"
+              allow="autoplay"
+            />
+            {/* Live Preview Indicator */}
+            <div className="absolute top-3 right-3 z-10 flex items-center space-x-1.5 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-xs text-amber-300 text-[10px] font-bold border border-amber-400/40 shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              <span>Preview</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <>
+            <img
+              src={video.thumbnailUrl || `https://img.youtube.com/vi/${video.youtubeVideoId}/hqdefault.jpg`}
+              alt={video.title}
+              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+            {/* Play Button Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-amber-500/90 group-hover:bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-200">
+                <Play className="w-5 h-5 fill-slate-950 ml-0.5" />
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Category & Duration */}
         <div className="absolute top-3 left-3 z-10">
@@ -44,7 +103,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </span>
         </div>
 
-        {video.duration && (
+        {!isHoverPlaying && video.duration && (
           <div className="absolute bottom-3 right-3 z-10 flex items-center space-x-1 px-2 py-0.5 rounded-md bg-black/80 text-white text-[11px] font-mono">
             <Clock className="w-3 h-3 text-slate-300" />
             <span>{video.duration}</span>

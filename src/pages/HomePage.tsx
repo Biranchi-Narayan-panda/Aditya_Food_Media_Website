@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
 import { ProductCard } from '../components/ProductCard';
 import { VideoCard } from '../components/VideoCard';
@@ -23,6 +23,39 @@ import {
 export const HomePage: React.FC = () => {
   const { products, videos, setActiveVideo, navigate, getWhatsAppUrl, t, language } = useSite();
   const [heroMode, setHeroMode] = useState<'both' | 'foods' | 'media'>('both');
+  const [featuredHoverPlaying, setFeaturedHoverPlaying] = useState(false);
+  const featuredStartTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const featuredStopTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearFeaturedTimers = () => {
+    if (featuredStartTimerRef.current) {
+      clearTimeout(featuredStartTimerRef.current);
+      featuredStartTimerRef.current = null;
+    }
+    if (featuredStopTimerRef.current) {
+      clearTimeout(featuredStopTimerRef.current);
+      featuredStopTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => clearFeaturedTimers();
+  }, []);
+
+  const handleFeaturedMouseEnter = () => {
+    clearFeaturedTimers();
+    featuredStartTimerRef.current = setTimeout(() => {
+      setFeaturedHoverPlaying(true);
+      featuredStopTimerRef.current = setTimeout(() => {
+        setFeaturedHoverPlaying(false);
+      }, 15000);
+    }, 250);
+  };
+
+  const handleFeaturedMouseLeave = () => {
+    clearFeaturedTimers();
+    setFeaturedHoverPlaying(false);
+  };
 
   const displayProducts = useMemo(() => {
     const featured = products.filter((p) => p.featured).slice(0, 4);
@@ -401,22 +434,45 @@ export const HomePage: React.FC = () => {
         {/* Featured Most-Viewed Video */}
         {featuredVideo && (
           <div
-            onClick={() => setActiveVideo(featuredVideo)}
+            onMouseEnter={handleFeaturedMouseEnter}
+            onMouseLeave={handleFeaturedMouseLeave}
+            onClick={() => {
+              clearFeaturedTimers();
+              setFeaturedHoverPlaying(false);
+              setActiveVideo(featuredVideo);
+            }}
             className="group relative rounded-3xl overflow-hidden border border-slate-200 bg-white cursor-pointer shadow-xs hover:shadow-md transition-all"
           >
             <div className="aspect-21/9 sm:aspect-16/7 w-full relative">
-              <img
-                src={featuredVideo.thumbnailUrl}
-                alt={featuredVideo.title}
-                className="w-full h-full object-cover transform group-hover:scale-102 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
-
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-amber-500 group-hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-200">
-                  <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-slate-950 ml-1" />
+              {featuredHoverPlaying ? (
+                <div className="w-full h-full pointer-events-none relative bg-black">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${featuredVideo.youtubeVideoId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${featuredVideo.youtubeVideoId}`}
+                    title={featuredVideo.title}
+                    className="w-full h-full border-0 scale-105"
+                    allow="autoplay"
+                  />
+                  <div className="absolute top-4 right-4 z-10 flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-xs text-amber-300 text-xs font-bold border border-amber-400/40 shadow-xs">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <span>Previewing</span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <img
+                    src={featuredVideo.thumbnailUrl}
+                    alt={featuredVideo.title}
+                    className="w-full h-full object-cover transform group-hover:scale-102 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-amber-500 group-hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-200">
+                      <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-slate-950 ml-1" />
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-white">
                 <div className="max-w-2xl space-y-1.5">

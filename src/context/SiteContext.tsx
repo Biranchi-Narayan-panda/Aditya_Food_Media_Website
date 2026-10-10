@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Product, VideoItem, PortfolioItem, SiteSettings } from '../types';
 import { fetchProducts, fetchVideos, fetchPortfolio, fetchSiteSettings } from '../firebase/services';
-import { INITIAL_SETTINGS } from '../firebase/seedData';
+import { INITIAL_PRODUCTS, INITIAL_VIDEOS, INITIAL_PORTFOLIO, INITIAL_SETTINGS } from '../firebase/seedData';
 import { Language, TranslationDictionary, translations, PRODUCT_TRANSLATIONS } from '../i18n/translations';
 
 interface SiteContextType {
@@ -34,11 +34,11 @@ interface SiteContextType {
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [videos, setVideos] = useState<VideoItem[]>([]);
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [videos, setVideos] = useState<VideoItem[]>(INITIAL_VIDEOS);
+  const [portfolio, setPortfolio] = useState<PortfolioItem[]>(INITIAL_PORTFOLIO);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Bilingual Language State (Defaults to ODIA for first-time visitors)
   const [language, setLanguageState] = useState<Language>(() => {
