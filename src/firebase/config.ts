@@ -21,4 +21,5 @@ export async function testFirestoreConnection(): Promise<boolean> {
   }
 }
 
-testFirestoreConnection();
+// Safely invoke connection check without uncaught rejection
+testFirestoreConnection().catch(() => {});

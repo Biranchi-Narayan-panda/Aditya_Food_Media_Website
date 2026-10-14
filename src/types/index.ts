@@ -64,6 +64,14 @@ export interface Enquiry {
   createdAt: string;
 }
 
+export interface EnquiryMetadata {
+  referenceNumber: string;
+  enquiryType: string;
+  createdAt: string;
+  emailDeliveryStatus: 'delivered' | 'failed';
+  channel: 'emailjs';
+}
+
 export interface SiteSettings {
   id: string;
   companyName: string;

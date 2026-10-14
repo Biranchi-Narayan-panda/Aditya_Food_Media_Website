@@ -20,7 +20,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="group relative bg-white border border-slate-200/90 hover:border-emerald-300 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col">
       {/* Product Image */}
       <div
-        className="relative aspect-4/3 w-full bg-slate-100 overflow-hidden cursor-pointer"
+        className="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden cursor-pointer"
         onClick={() => setActiveProduct(product)}
       >
         <img

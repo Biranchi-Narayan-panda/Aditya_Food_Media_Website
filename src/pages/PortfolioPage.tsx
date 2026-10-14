@@ -105,7 +105,7 @@ export const PortfolioPage: React.FC = () => {
               >
                 {/* Image */}
                 <div
-                  className="relative aspect-16/9 w-full bg-slate-100 overflow-hidden cursor-pointer"
+                  className="relative aspect-video w-full bg-slate-100 overflow-hidden cursor-pointer"
                   onClick={() => setLightboxItem(item)}
                 >
                   <img
@@ -183,7 +183,7 @@ export const PortfolioPage: React.FC = () => {
             className="relative max-w-4xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative aspect-16/9 w-full bg-black">
+            <div className="relative aspect-video w-full bg-black">
               <img
                 src={lightboxItem.imageUrl}
                 alt={lightboxItem.title}

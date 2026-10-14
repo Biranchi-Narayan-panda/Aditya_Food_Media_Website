@@ -67,7 +67,7 @@ export const MediaPage: React.FC = () => {
       {heroVideo && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-xs">
-            <div className="aspect-21/9 sm:aspect-16/7 w-full relative">
+            <div className="aspect-video sm:aspect-[21/9] w-full relative">
               <img
                 src={heroVideo.thumbnailUrl || 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80'}
                 alt={heroVideo.title}

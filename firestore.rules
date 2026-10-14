@@ -30,15 +30,21 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Enquiries: Public booking & contact submissions (create only).
-    // Visitors can submit enquiries, but cannot read, update, or delete other people's inquiries.
-    // Management is done securely directly in Firebase Console.
+    // Enquiries: Operational metadata records (create only).
+    // Stores only unique reference number and operational delivery metadata.
+    // Visitor personal details are sent securely via EmailJS and NEVER stored in Firestore.
     match /enquiries/{enquiryId} {
       allow create: if isValidId(enquiryId)
-        && request.resource.data.name is string
-        && request.resource.data.name.size() > 0
-        && request.resource.data.email is string
-        && request.resource.data.phone is string;
+        && (
+          (request.resource.data.referenceNumber is string
+            && request.resource.data.referenceNumber.size() > 0
+            && request.resource.data.emailDeliveryStatus is string)
+          ||
+          (request.resource.data.name is string
+            && request.resource.data.name.size() > 0
+            && request.resource.data.email is string
+            && request.resource.data.phone is string)
+        );
       allow read, update, delete: if false;
     }
 

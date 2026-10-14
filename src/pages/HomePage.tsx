@@ -443,7 +443,7 @@ export const HomePage: React.FC = () => {
             }}
             className="group relative rounded-3xl overflow-hidden border border-slate-200 bg-white cursor-pointer shadow-xs hover:shadow-md transition-all"
           >
-            <div className="aspect-21/9 sm:aspect-16/7 w-full relative">
+            <div className="aspect-video sm:aspect-[21/9] w-full relative">
               {featuredHoverPlaying ? (
                 <div className="w-full h-full pointer-events-none relative bg-black">
                   <iframe

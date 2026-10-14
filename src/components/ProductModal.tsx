@@ -60,7 +60,7 @@ export const ProductModal: React.FC = () => {
         <div className="overflow-y-auto p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             {/* Image */}
-            <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm">
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm">
               <img
                 src={activeProduct.imageUrl}
                 alt={localized.name}

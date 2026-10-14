@@ -62,23 +62,18 @@
       "required": ["id", "title", "category", "description", "imageUrl"]
     },
     "enquiry": {
-      "title": "Enquiry",
-      "description": "Customer inquiry for products, food consultation, or media collaborations",
+      "title": "EnquiryTracking",
+      "description": "Minimal inquiry tracking record storing reference number and email status without customer PII",
       "type": "object",
       "properties": {
         "id": { "type": "string", "maxLength": 128 },
-        "name": { "type": "string", "maxLength": 120 },
-        "email": { "type": "string", "maxLength": 150 },
-        "phone": { "type": "string", "maxLength": 50 },
-        "businessName": { "type": "string", "maxLength": 150 },
-        "enquiryType": { "type": "string", "maxLength": 50 },
-        "relatedItem": { "type": "string", "maxLength": 120 },
-        "message": { "type": "string", "maxLength": 2000 },
-        "preferredContact": { "type": "string", "maxLength": 50 },
-        "status": { "type": "string", "maxLength": 30 },
+        "referenceNumber": { "type": "string", "maxLength": 64 },
+        "emailStatus": { "type": "string", "maxLength": 30 },
+        "deliveryId": { "type": "string", "maxLength": 128 },
+        "sourceCategory": { "type": "string", "maxLength": 50 },
         "createdAt": { "type": "string" }
       },
-      "required": ["id", "name", "email", "phone", "enquiryType", "message", "status"]
+      "required": ["id", "referenceNumber", "emailStatus", "createdAt"]
     },
     "siteSettings": {
       "title": "SiteSettings",

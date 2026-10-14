@@ -7,7 +7,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 import { handleFirestoreError, OperationType } from './errors';
-import { Product, VideoItem, PortfolioItem, Enquiry, SiteSettings } from '../types';
+import { Product, VideoItem, PortfolioItem, Enquiry, SiteSettings, EnquiryMetadata } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_VIDEOS, INITIAL_PORTFOLIO, INITIAL_SETTINGS } from './seedData';
 
 // Helper to extract YouTube video ID from various formats
@@ -77,6 +77,20 @@ export async function fetchPortfolio(): Promise<PortfolioItem[]> {
 }
 
 // ---------------- ENQUIRIES ----------------
+/**
+ * Records ONLY minimum operational metadata (reference number, timestamp, delivery status).
+ * Never stores personal details (name, email, phone, message) in Firestore.
+ */
+export async function recordEnquiryOperationalMetadata(metadata: EnquiryMetadata): Promise<void> {
+  const path = `enquiries/${metadata.referenceNumber}`;
+  try {
+    await setDoc(doc(db, 'enquiries', metadata.referenceNumber), metadata);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, path);
+    throw error;
+  }
+}
+
 export async function submitEnquiry(data: Omit<Enquiry, 'id' | 'createdAt' | 'status'>): Promise<Enquiry> {
   const id = 'enq-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7);
   const enquiry: Enquiry = {

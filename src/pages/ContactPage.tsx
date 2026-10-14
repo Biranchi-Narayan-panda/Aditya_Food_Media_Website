@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSite } from '../context/SiteContext';
-import { submitEnquiry } from '../firebase/services';
+import { processEnquirySubmission } from '../services/emailService';
 import {
   Phone,
   Mail,
@@ -21,43 +21,57 @@ export const ContactPage: React.FC = () => {
   const [enquiryType, setEnquiryType] = useState<'product' | 'consultation' | 'media' | 'general'>('product');
   const [message, setMessage] = useState('');
   const [preferredContact, setPreferredContact] = useState<'whatsapp' | 'email' | 'phone'>('whatsapp');
+  const [honeypot, setHoneypot] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
-  const [successId, setSuccessId] = useState<string | null>(null);
+  const [successInfo, setSuccessInfo] = useState<{
+    referenceNumber: string;
+    status: 'fully_completed' | 'email_sent_db_failed';
+    warningMessage?: string;
+  } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return; // Prevent duplicate clicks
     setErrorMessage(null);
-
-    if (!name.trim() || !email.trim() || !phone.trim() || !message.trim()) {
-      setErrorMessage(
-        language === 'or'
-          ? 'ଦୟାକରି ସମସ୍ତ ଆବଶ୍ୟକ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।'
-          : 'Please fill in all mandatory fields.'
-      );
-      return;
-    }
+    setSuccessInfo(null);
 
     setSubmitting(true);
     try {
-      // Save directly to Firebase Firestore
-      const res = await submitEnquiry({
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
+      const result = await processEnquirySubmission({
+        name,
+        email,
+        phone,
         enquiryType,
-        message: message.trim(),
+        message,
         preferredContact,
+        honeypot,
       });
 
-      setSuccessId(res.id);
-      setName('');
-      setEmail('');
-      setPhone('');
-      setMessage('');
-    } catch (err) {
-      console.error('Submission error:', err);
+      if (result.success) {
+        if (result.status === 'fully_completed') {
+          setSuccessInfo({
+            referenceNumber: result.referenceNumber,
+            status: 'fully_completed',
+          });
+        } else {
+          setSuccessInfo({
+            referenceNumber: result.referenceNumber,
+            status: 'email_sent_db_failed',
+            warningMessage: language === 'or' ? result.warningMessageOr : result.warningMessageEn,
+          });
+        }
+        // Clear form fields
+        setName('');
+        setEmail('');
+        setPhone('');
+        setMessage('');
+        setHoneypot('');
+      } else {
+        setErrorMessage(language === 'or' ? result.messageOr : result.messageEn);
+      }
+    } catch {
       setErrorMessage(t.contact.errorMessage);
     } finally {
       setSubmitting(false);
@@ -179,13 +193,34 @@ export const ContactPage: React.FC = () => {
                 </p>
               </div>
 
-              {successId && (
+              {successInfo && successInfo.status === 'fully_completed' && (
                 <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm flex items-start space-x-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <span className="font-bold">{t.contact.successMessage}</span>
                     <p className="text-xs text-emerald-800">
-                      Reference ID: <span className="font-mono font-semibold">{successId}</span>
+                      Reference ID: <span className="font-mono font-semibold">{successInfo.referenceNumber}</span>
+                    </p>
+                    <p className="text-[11px] text-emerald-700">
+                      {language === 'or'
+                        ? 'ଆପଣଙ୍କ ଅନୁରୋଧ ଇମେଲ୍ ମାଧ୍ୟମରେ ସଫଳତାର ସହିତ ପଠାଗଲା।'
+                        : 'A notification email has been dispatched to adityafoodsandmedia.it@gmail.com.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {successInfo && successInfo.status === 'email_sent_db_failed' && (
+                <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs sm:text-sm flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <span className="font-bold">
+                      {language === 'or'
+                        ? `ଇମେଲ୍ ସଫଳତାର ସହିତ ପଠାଯାଇଛି (ସନ୍ଦର୍ଭ: ${successInfo.referenceNumber})`
+                        : `Enquiry Email Delivered (Ref: ${successInfo.referenceNumber})`}
+                    </span>
+                    <p className="text-xs text-amber-900 leading-relaxed">
+                      {successInfo.warningMessage}
                     </p>
                   </div>
                 </div>
@@ -199,6 +234,17 @@ export const ContactPage: React.FC = () => {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Honeypot field for anti-spam bot defense */}
+                <input
+                  type="text"
+                  name="website_url_hp"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden pointer-events-none"
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
