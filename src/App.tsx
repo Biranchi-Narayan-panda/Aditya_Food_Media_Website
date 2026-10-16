@@ -8,15 +8,22 @@ import { ProductModal } from './components/ProductModal';
 
 // Pages
 import { HomePage } from './pages/HomePage';
-import { AboutPage } from './pages/AboutPage';
-import { FoodsPage } from './pages/FoodsPage';
-import { ProductsPage } from './pages/ProductsPage';
-import { ConsultationPage } from './pages/ConsultationPage';
-import { MediaPage } from './pages/MediaPage';
-import { VideosPage } from './pages/VideosPage';
-import { PortfolioPage } from './pages/PortfolioPage';
-import { ContactPage } from './pages/ContactPage';
-import { PrivacyPolicyPage, TermsPage } from './pages/LegalPages';
+const AboutPage = React.lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })));
+const FoodsPage = React.lazy(() => import('./pages/FoodsPage').then((m) => ({ default: m.FoodsPage })));
+const ProductsPage = React.lazy(() => import('./pages/ProductsPage').then((m) => ({ default: m.ProductsPage })));
+const ConsultationPage = React.lazy(() => import('./pages/ConsultationPage').then((m) => ({ default: m.ConsultationPage })));
+const MediaPage = React.lazy(() => import('./pages/MediaPage').then((m) => ({ default: m.MediaPage })));
+const VideosPage = React.lazy(() => import('./pages/VideosPage').then((m) => ({ default: m.VideosPage })));
+const PortfolioPage = React.lazy(() => import('./pages/PortfolioPage').then((m) => ({ default: m.PortfolioPage })));
+const ContactPage = React.lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })));
+const PrivacyPolicyPage = React.lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.PrivacyPolicyPage })));
+const TermsPage = React.lazy(() => import('./pages/LegalPages').then((m) => ({ default: m.TermsPage })));
+
+const RouteLoadingFallback = () => (
+  <div className="min-h-[50vh] flex items-center justify-center py-20">
+    <div className="w-7 h-7 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
+  </div>
+);
 
 const AppContent: React.FC = () => {
   const { currentPath, navigate, t } = useSite();
@@ -94,7 +101,9 @@ const AppContent: React.FC = () => {
       <Navbar />
 
       <main className="flex-1">
-        {renderCurrentPage()}
+        <React.Suspense fallback={<RouteLoadingFallback />}>
+          {renderCurrentPage()}
+        </React.Suspense>
       </main>
 
       <Footer />

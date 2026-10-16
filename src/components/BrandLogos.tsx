@@ -1,7 +1,7 @@
 import React from 'react';
-import mainLogoImg from '../assets/images/aditya_main_logo_1790692269495.jpg';
-import foodsEmblemImg from '../assets/images/aditya_foods_emblem_1790692289869.jpg';
-import mediaEmblemImg from '../assets/images/aditya_media_emblem_1790692305095.jpg';
+import mainLogoImg from '../assets/images/aditya_main_logo.webp';
+import foodsEmblemImg from '../assets/images/aditya_foods_emblem.webp';
+import mediaEmblemImg from '../assets/images/aditya_media_emblem.webp';
 
 export { mainLogoImg, foodsEmblemImg, mediaEmblemImg };
 
