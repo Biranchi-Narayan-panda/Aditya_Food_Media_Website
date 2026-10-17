@@ -24,8 +24,8 @@ export const HomePage: React.FC = () => {
   const { products, videos, setActiveVideo, navigate, getWhatsAppUrl, t, language } = useSite();
   const [heroMode, setHeroMode] = useState<'both' | 'foods' | 'media'>('both');
   const [featuredHoverPlaying, setFeaturedHoverPlaying] = useState(false);
-  const featuredStartTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const featuredStopTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const featuredStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const featuredStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearFeaturedTimers = () => {
     if (featuredStartTimerRef.current) {

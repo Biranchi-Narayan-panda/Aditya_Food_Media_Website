@@ -8,8 +8,8 @@ export const VideosPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [featuredHoverPlaying, setFeaturedHoverPlaying] = useState(false);
-  const startTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const stopTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimers = () => {
     if (startTimerRef.current) {

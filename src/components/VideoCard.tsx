@@ -13,8 +13,8 @@ const HOVER_PLAY_DURATION_MS = 15000; // Plays for 15 seconds on hover
 export const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const { setActiveVideo, t } = useSite();
   const [isHoverPlaying, setIsHoverPlaying] = useState(false);
-  const startTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const stopTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimers = () => {
     if (startTimerRef.current) {
