@@ -155,7 +155,7 @@ export const ContactPage: React.FC = () => {
                     <span className="block text-xs uppercase text-slate-500 font-bold">
                       {t.contact.hoursLabel}
                     </span>
-                    <span className="text-slate-800 text-xs">
+                    <span className="block text-slate-800 text-xs leading-relaxed whitespace-pre-line mt-0.5">
                       {t.contact.hoursValue}
                     </span>
                   </div>
