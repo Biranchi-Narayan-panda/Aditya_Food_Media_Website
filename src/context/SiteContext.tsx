@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { Product, VideoItem, PortfolioItem, SiteSettings } from '../types';
 import { fetchProducts, fetchVideos, fetchPortfolio, fetchSiteSettings } from '../firebase/services';
 import { INITIAL_PRODUCTS, INITIAL_VIDEOS, INITIAL_PORTFOLIO, INITIAL_SETTINGS } from '../firebase/seedData';
@@ -150,36 +150,58 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshData();
   }, [refreshData]);
 
-  const getWhatsAppUrl = (customMessage?: string): string => {
-    const rawNumber = settings.whatsapp || '+919437012345';
-    const cleanNumber = rawNumber.replace(/[^0-9]/g, '');
-    const defaultMsg = 'Hello Aditya Food & Media, I would like to enquire about your products and media services.';
-    const encoded = encodeURIComponent(customMessage || defaultMsg);
-    return `https://wa.me/${cleanNumber}?text=${encoded}`;
-  };
+  const getWhatsAppUrl = useCallback(
+    (customMessage?: string): string => {
+      const rawNumber = settings.whatsapp || '+919437012345';
+      const cleanNumber = rawNumber.replace(/[^0-9]/g, '');
+      const defaultMsg = 'Hello Aditya Food & Media, I would like to enquire about your products and media services.';
+      const encoded = encodeURIComponent(customMessage || defaultMsg);
+      return `https://wa.me/${cleanNumber}?text=${encoded}`;
+    },
+    [settings.whatsapp]
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      products,
+      videos,
+      portfolio,
+      settings,
+      loading,
+      refreshData,
+      activeVideo,
+      setActiveVideo,
+      activeProduct,
+      setActiveProduct,
+      getWhatsAppUrl,
+      currentPath,
+      navigate,
+      language,
+      setLanguage,
+      t,
+      getProductLocalized,
+    }),
+    [
+      products,
+      videos,
+      portfolio,
+      settings,
+      loading,
+      refreshData,
+      activeVideo,
+      activeProduct,
+      getWhatsAppUrl,
+      currentPath,
+      navigate,
+      language,
+      setLanguage,
+      t,
+      getProductLocalized,
+    ]
+  );
 
   return (
-    <SiteContext.Provider
-      value={{
-        products,
-        videos,
-        portfolio,
-        settings,
-        loading,
-        refreshData,
-        activeVideo,
-        setActiveVideo,
-        activeProduct,
-        setActiveProduct,
-        getWhatsAppUrl,
-        currentPath,
-        navigate,
-        language,
-        setLanguage,
-        t,
-        getProductLocalized,
-      }}
-    >
+    <SiteContext.Provider value={contextValue}>
       {children}
     </SiteContext.Provider>
   );

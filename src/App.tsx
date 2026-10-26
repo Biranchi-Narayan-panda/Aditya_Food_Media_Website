@@ -5,7 +5,6 @@ import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { VideoModal } from './components/VideoModal';
 import { ProductModal } from './components/ProductModal';
-import { LaxmiPujaPopup } from './components/LaxmiPujaPopup';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -112,7 +111,6 @@ const AppContent: React.FC = () => {
       <FloatingWhatsApp />
       <VideoModal />
       <ProductModal />
-      <LaxmiPujaPopup />
     </div>
   );
 };
