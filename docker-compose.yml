@@ -11,6 +11,7 @@ services:
     restart: unless-stopped
     ports:
       - "${PORT:-80}:80"
+      - "443:443"
     environment:
       - NODE_ENV=production
     logging:
@@ -24,4 +25,3 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-

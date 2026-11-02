@@ -34,6 +34,14 @@ RUN npm run build
 # ==============================================================
 FROM nginx:1.27-alpine AS runner
 
+# Install OpenSSL and generate self-signed SSL certificates for HTTPS (port 443)
+RUN apk add --no-cache openssl && \
+    mkdir -p /etc/nginx/ssl && \
+    openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+    -keyout /etc/nginx/ssl/nginx.key \
+    -out /etc/nginx/ssl/nginx.crt \
+    -subj "/CN=179.197.253.67/O=AdityaFoodMedia/C=IN"
+
 # Remove default configurations and assets
 RUN rm -rf /usr/share/nginx/html/* /etc/nginx/conf.d/default.conf
 
@@ -43,8 +51,8 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy compiled SPA bundle from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Expose HTTP port 80
-EXPOSE 80
+# Expose HTTP port 80 and HTTPS port 443
+EXPOSE 80 443
 
 # Health check to ensure web server is responding
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
@@ -52,4 +60,3 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 # Start Nginx in the foreground
 CMD ["nginx", "-g", "daemon off;"]
-
