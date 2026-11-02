@@ -10,8 +10,7 @@ services:
     container_name: aditya-food-media-web
     restart: unless-stopped
     ports:
-      - "${PORT:-80}:80"
-      - "443:443"
+      - "${PORT:-3000}:80"
     environment:
       - NODE_ENV=production
     logging:
